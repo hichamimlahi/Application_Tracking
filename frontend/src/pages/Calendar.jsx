@@ -16,9 +16,20 @@ import {
 import { fr } from 'date-fns/locale';
 import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 
+const getAcronym = (name) => {
+    if (!name) return '';
+    const cleanName = name
+        .replace(/['’]/g, ' ')
+        .replace(/\b(de|des|d|l|la|le|les|et|en|pour)\b/gi, ' ');
+    
+    const words = cleanName.split(/[\s-]+/).filter(w => w.length > 0);
+    return words.map(w => w[0].toUpperCase()).join('').substring(0, 4);
+};
+
 const EVENT_TYPES = {
     deadline: { label: 'Date limite', color: 'bg-red-100 text-red-700 border-red-200', dot: 'bg-red-500' },
     exam: { label: 'Concours', color: 'bg-purple-100 text-purple-700 border-purple-200', dot: 'bg-purple-500' },
+    preselection: { label: 'Présélection', color: 'bg-orange-100 text-orange-700 border-orange-200', dot: 'bg-orange-500' },
     result: { label: 'Resultats', color: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500' },
     other: { label: 'Autre date', color: 'bg-blue-100 text-blue-700 border-blue-200', dot: 'bg-blue-500' },
 };
@@ -80,7 +91,17 @@ const collectEvents = (applications) => {
             status: application.status,
         };
 
-        if (application.deadline_date) {
+        if (application.events && application.events.length > 0) {
+            application.events.forEach(e => {
+                events.push({
+                    ...base,
+                    id: `${application.id}-${e.id}`,
+                    type: e.type,
+                    title: e.title,
+                    date: e.event_date,
+                });
+            });
+        } else if (application.deadline_date) {
             events.push({
                 ...base,
                 id: `${application.id}-deadline`,
@@ -89,22 +110,6 @@ const collectEvents = (applications) => {
                 date: application.deadline_date,
             });
         }
-
-        const originalJson = parseOriginalJson(application.notes);
-
-        DATE_KEYS.forEach(({ key, type, label }) => {
-            const value = readNestedValue(originalJson, key);
-
-            if (isIsoDate(value) && value !== application.deadline_date) {
-                events.push({
-                    ...base,
-                    id: `${application.id}-${key}`,
-                    type,
-                    title: label,
-                    date: value,
-                });
-            }
-        });
 
         return events;
     }).sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -264,10 +269,10 @@ const Calendar = () => {
                                         {dayEvents.slice(0, 3).map((event) => (
                                             <div
                                                 key={event.id}
-                                                className={`truncate rounded-md border px-2 py-1 text-[11px] font-medium ${EVENT_TYPES[event.type].color}`}
-                                                title={`${event.title} - ${event.institution?.acronym || event.institution?.name} - ${event.programName}`}
+                                                className={`truncate rounded-md border px-2 py-1 text-[11px] font-medium ${EVENT_TYPES[event.type]?.color || EVENT_TYPES.other.color}`}
+                                                title={`${event.title} - ${event.institution?.name} - ${event.programName}`}
                                             >
-                                                {event.institution?.acronym || event.institution?.name}: {event.title}
+                                                {event.institution?.acronym || getAcronym(event.institution?.name)} - {event.title}
                                             </div>
                                         ))}
                                         {dayEvents.length > 3 && (

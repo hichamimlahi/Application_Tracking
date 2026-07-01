@@ -10,6 +10,14 @@ const STATUS_MAP = {
     'refuse': { title: 'Refusé', color: 'bg-red-100 text-red-800' },
 };
 
+const DOC_TYPES = {
+    'cv': 'CV',
+    'motivation_letter': 'Lettre de motivation',
+    'transcript': 'Relevé de notes',
+    'receipt': 'Reçu / Preuve de soumission',
+    'other': 'Autre document'
+};
+
 const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess }) => {
     const [application, setApplication] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -221,6 +229,7 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
                                 <input type="date" required value={newEvent.event_date} onChange={e => setNewEvent({...newEvent, event_date: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-sm" />
                                 <select value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-sm">
                                     <option value="exam">Concours</option>
+                                    <option value="preselection">Présélection</option>
                                     <option value="deadline">Date Limite</option>
                                     <option value="result">Résultats</option>
                                     <option value="oral">Oral</option>
@@ -300,7 +309,7 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
                                                     <a href={`http://localhost:8000/storage/${doc.file_path}`} target="_blank" rel="noreferrer" className="text-sm font-medium text-blue-600 hover:underline">
                                                         {doc.title}
                                                     </a>
-                                                    <p className="text-xs text-gray-500 capitalize">{doc.document_type ? doc.document_type.replace('_', ' ') : ''}</p>
+                                                    <p className="text-xs text-gray-500 capitalize">{DOC_TYPES[doc.document_type] || (doc.document_type ? doc.document_type.replace('_', ' ') : '')}</p>
                                                 </div>
                                             </div>
                                             <button onClick={() => handleDeleteDocument(doc.id)} className="text-sm text-red-600 hover:text-red-800">
@@ -322,6 +331,7 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
                                         <option value="cv">CV</option>
                                         <option value="motivation_letter">Lettre de motivation</option>
                                         <option value="transcript">Relevé de notes</option>
+                                        <option value="receipt">Reçu / Preuve de soumission</option>
                                         <option value="other">Autre</option>
                                     </select>
                                 </div>

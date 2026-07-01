@@ -5,7 +5,6 @@ import { PlusIcon } from '@heroicons/react/24/outline';
 import ApplicationForm from '../components/ApplicationForm';
 import ApplicationDetails from '../components/ApplicationDetails';
 import JsonApplicationImport from '../components/JsonApplicationImport';
-
 const STATUSES = {
     'brouillon': { id: 'brouillon', title: 'Brouillon', border: 'border-t-gray-400', bg: 'bg-gray-50/80', dot: 'bg-gray-400' },
     'soumis': { id: 'soumis', title: 'Soumis', border: 'border-t-blue-500', bg: 'bg-blue-50/50', dot: 'bg-blue-500' },
@@ -13,6 +12,16 @@ const STATUSES = {
     'attente': { id: 'attente', title: 'En Attente', border: 'border-t-yellow-400', bg: 'bg-yellow-50/50', dot: 'bg-yellow-400' },
     'accepte': { id: 'accepte', title: 'Accepté', border: 'border-t-green-500', bg: 'bg-green-50/50', dot: 'bg-green-500' },
     'refuse': { id: 'refuse', title: 'Refusé', border: 'border-t-red-500', bg: 'bg-red-50/50', dot: 'bg-red-500' },
+};
+
+const getAcronym = (name) => {
+    if (!name) return '';
+    const cleanName = name
+        .replace(/['’]/g, ' ')
+        .replace(/\b(de|des|d|l|la|le|les|et|en|pour)\b/gi, ' ');
+    
+    const words = cleanName.split(/[\s-]+/).filter(w => w.length > 0);
+    return words.map(w => w[0].toUpperCase()).join('').substring(0, 4);
 };
 
 const Kanban = () => {
@@ -177,12 +186,12 @@ const Kanban = () => {
                                                                 {app.institution?.logo ? (
                                                                     <img src={app.institution.logo} alt="" className="w-8 h-8 rounded-md object-contain bg-white flex-shrink-0 shadow-sm border border-gray-100" />
                                                                 ) : (
-                                                                    <span className="w-8 h-8 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                                                                        {app.institution?.acronym?.substring(0,2) || app.institution?.name?.substring(0, 2).toUpperCase()}
-                                                                </span>
+                                                                    <span className="w-8 h-8 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[10px] flex-shrink-0">
+                                                                        {app.institution?.acronym?.substring(0,3) || getAcronym(app.institution?.name).substring(0, 3)}
+                                                                    </span>
                                                                 )}
                                                                 <div className="font-semibold text-gray-800 leading-tight">
-                                                                    {app.institution?.acronym ? `${app.institution.acronym}` : app.institution?.name}
+                                                                    {app.institution?.acronym || getAcronym(app.institution?.name)}
                                                                 </div>
                                                             </div>
                                                             <div className="text-sm text-gray-500 mt-1 line-clamp-2">{app.program_name}</div>
@@ -192,7 +201,7 @@ const Kanban = () => {
                                                                         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
-                                                                        {new Date(app.deadline_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                                        DL : {new Date(app.deadline_date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
                                                                     </div>
                                                                 </div>
                                                             )}

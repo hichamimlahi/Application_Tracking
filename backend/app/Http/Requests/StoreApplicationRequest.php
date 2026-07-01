@@ -24,6 +24,7 @@ class StoreApplicationRequest extends FormRequest
         return [
             'institution_id' => 'nullable|exists:institutions,id',
             'new_institution_name' => 'required_without:institution_id|string|max:255',
+            'new_institution_acronym' => 'nullable|string|max:255',
             'new_institution_website' => 'nullable|url|max:255',
             'program_name' => 'required|string|max:255',
             'program_type' => 'required|in:cycle_ingenieur,master',

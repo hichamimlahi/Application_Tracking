@@ -29,7 +29,9 @@ class ApplicationController extends Controller
         if (empty($validated['institution_id']) && !empty($validated['new_institution_name'])) {
             $institution = \App\Models\Institution::create([
                 'name' => $validated['new_institution_name'],
-                'website' => $validated['new_institution_website'] ?? null,
+                'acronym' => $validated['new_institution_acronym'] ?? null,
+                'type' => in_array($validated['program_type'] ?? '', ['cycle_ingenieur', 'master']) ? $validated['program_type'] : 'cycle_ingenieur',
+                'website_url' => $validated['new_institution_website'] ?? null,
             ]);
             $validated['institution_id'] = $institution->id;
         }

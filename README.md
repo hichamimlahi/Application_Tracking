@@ -53,6 +53,7 @@ Copiez ce prompt dans ChatGPT avec le texte de l'annonce :
 >   },
 >   "concours": {
 >     "date_limite": "YYYY-MM-DD",
+>     "date_preselection": "YYYY-MM-DD",
 >     "date_concours": "YYYY-MM-DD",
 >     "date_resultats": "YYYY-MM-DD",
 >     "mode_candidature": "en_ligne ou papier",

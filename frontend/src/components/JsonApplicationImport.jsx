@@ -113,6 +113,33 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
         return String(value ?? '');
     };
 
+    const cleanUrl = (urlStr) => {
+        if (!urlStr) return null;
+        let clean = String(urlStr);
+        const mdMatch = clean.match(/\[.*?\]\((.*?)\)/);
+        if (mdMatch) {
+            clean = mdMatch[1];
+        }
+        clean = clean.trim();
+        if (!clean) return null;
+        if (!/^https?:\/\//i.test(clean)) {
+            clean = 'https://' + clean;
+        }
+        return clean;
+    };
+
+    const mapSubmissionMethod = (methodStr) => {
+        if (!methodStr) return null;
+        const normalized = String(methodStr).toLowerCase().replace(/[^a-z]/g, '');
+        if (normalized.includes('enligne') || normalized.includes('internet') || normalized.includes('web')) {
+            return 'en_ligne';
+        }
+        if (normalized.includes('papier') || normalized.includes('courrier') || normalized.includes('poste')) {
+            return 'papier';
+        }
+        return null;
+    };
+
     const buildNotes = (payload) => {
         const sections = [];
         const concours = payload.concours || {};
@@ -184,6 +211,8 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
 
         const events = [];
         if (deadlineDate) events.push({ type: 'deadline', title: 'Date limite', event_date: deadlineDate });
+        const preselectionDate = valueFrom(payload.date_preselection, payload.concours?.date_preselection);
+        if (preselectionDate) events.push({ type: 'preselection', title: 'Présélection', event_date: preselectionDate });
         const examDate = valueFrom(payload.date_concours, payload.concours?.date_concours);
         if (examDate) events.push({ type: 'exam', title: 'Concours', event_date: examDate });
         const resultDate = valueFrom(payload.date_resultats, payload.concours?.date_resultats);
@@ -197,12 +226,13 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
         return {
             institution_id: institutionId,
             new_institution_name: !institutionId ? (institutionPayload.nom || institutionPayload.name || institutionPayload.sigle || 'Nouvelle Institution') : null,
-            new_institution_website: !institutionId ? (institutionPayload.site_web || institutionPayload.website || null) : null,
+            new_institution_acronym: !institutionId ? (institutionPayload.sigle?.trim() || institutionPayload.acronym?.trim() || null) : null,
+            new_institution_website: !institutionId ? cleanUrl(institutionPayload.site_web || institutionPayload.website) : null,
             program_name: programName,
             program_type: valueFrom(payload.program_type, payload.type, formationPayload.type) || 'cycle_ingenieur',
             status: 'brouillon',
-            submission_method: valueFrom(payload.submission_method, payload.mode_candidature, payload.concours?.mode_candidature) || null,
-            portal_url: valueFrom(payload.portal_url, payload.lien_candidature, payload.concours?.lien_candidature) || null,
+            submission_method: mapSubmissionMethod(valueFrom(payload.submission_method, payload.mode_candidature, payload.concours?.mode_candidature)),
+            portal_url: cleanUrl(valueFrom(payload.portal_url, payload.lien_candidature, payload.concours?.lien_candidature)),
             deadline_date: deadlineDate,
             notes: buildNotes(payload),
             events,
