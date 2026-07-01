@@ -27,6 +27,8 @@ class UpdateApplicationRequest extends FormRequest
             'program_name' => 'sometimes|string|max:255',
             'program_type' => 'sometimes|in:cycle_ingenieur,master',
             'status' => 'sometimes|in:brouillon,soumis,concours,attente,accepte,refuse',
+            'submission_method' => 'nullable|in:en_ligne,papier',
+            'portal_url' => 'nullable|url|max:255',
             'deadline_date' => 'nullable|date',
             'notes' => 'nullable|string',
         ];

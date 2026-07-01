@@ -17,6 +17,8 @@ class Application extends Model
         'program_name',
         'program_type',
         'status',
+        'submission_method',
+        'portal_url',
         'deadline_date',
         'notes',
     ];
@@ -38,5 +40,15 @@ class Application extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(ApplicationEvent::class)->orderBy('event_date');
+    }
+
+    public function checklistItems(): HasMany
+    {
+        return $this->hasMany(ChecklistItem::class)->orderBy('position')->orderBy('id');
     }
 }

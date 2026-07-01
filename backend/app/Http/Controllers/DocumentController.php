@@ -13,6 +13,13 @@ class DocumentController extends Controller
     {
         $validated = $request->validated();
         
+        if (!empty($validated['application_id'])) {
+            $application = \App\Models\Application::findOrFail($validated['application_id']);
+            if ($application->user_id !== $request->user()->id) {
+                return response()->json(['success' => false, 'message' => 'Non autorisé'], 403);
+            }
+        }
+
         $path = $request->file('file')->store('documents', 'public');
 
         $document = $request->user()->documents()->create([

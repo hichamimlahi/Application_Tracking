@@ -22,12 +22,26 @@ class StoreApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'institution_id' => 'required|exists:institutions,id',
+            'institution_id' => 'nullable|exists:institutions,id',
+            'new_institution_name' => 'required_without:institution_id|string|max:255',
+            'new_institution_website' => 'nullable|url|max:255',
             'program_name' => 'required|string|max:255',
             'program_type' => 'required|in:cycle_ingenieur,master',
             'status' => 'nullable|in:brouillon,soumis,concours,attente,accepte,refuse',
+            'submission_method' => 'nullable|in:en_ligne,papier',
+            'portal_url' => 'nullable|url|max:255',
             'deadline_date' => 'nullable|date',
             'notes' => 'nullable|string',
+            'events' => 'nullable|array',
+            'events.*.type' => 'required_with:events|string',
+            'events.*.title' => 'required_with:events|string|max:255',
+            'events.*.event_date' => 'required_with:events|date',
+            'events.*.notes' => 'nullable|string',
+            'checklist_items' => 'nullable|array',
+            'checklist_items.*.title' => 'required_with:checklist_items|string|max:255',
+            'checklist_items.*.status' => 'nullable|in:todo,ready,sent',
+            'checklist_items.*.document_type' => 'nullable|string|max:255',
+            'checklist_items.*.position' => 'nullable|integer',
         ];
     }
 }

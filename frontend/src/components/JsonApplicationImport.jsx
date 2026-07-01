@@ -43,6 +43,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
     const [jsonText, setJsonText] = useState(SAMPLE_JSON);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [preview, setPreview] = useState(null);
 
     useEffect(() => {
         const fetchInstitutions = async () => {
@@ -159,10 +160,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
     const buildApplicationPayload = (payload) => {
         const formationPayload = payload.formation || payload.programme_detail || {};
         const institutionId = findInstitutionId(payload);
-
-        if (!institutionId) {
-            throw new Error("Institution introuvable. Utilise institution_id, institution_acronym, sigle ou institution_name.");
-        }
+        const institutionPayload = payload.institution || payload.ecole || payload.school || {};
 
         const programName = valueFrom(
             payload.program_name,
@@ -177,34 +175,67 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
             throw new Error("Le JSON doit contenir program_name, programme ou filiere.");
         }
 
+        const deadlineDate = valueFrom(
+            payload.deadline_date,
+            payload.date_limite,
+            payload.concours?.date_limite,
+            payload.concours?.deadline_date
+        ) || null;
+
+        const events = [];
+        if (deadlineDate) events.push({ type: 'deadline', title: 'Date limite', event_date: deadlineDate });
+        const examDate = valueFrom(payload.date_concours, payload.concours?.date_concours);
+        if (examDate) events.push({ type: 'exam', title: 'Concours', event_date: examDate });
+        const resultDate = valueFrom(payload.date_resultats, payload.concours?.date_resultats);
+        if (resultDate) events.push({ type: 'result', title: 'Résultats', event_date: resultDate });
+
+        const documents = payload.documents || payload.documents_requis || payload.concours?.documents || [];
+        const checklist_items = Array.isArray(documents) 
+            ? documents.map((doc, index) => ({ title: doc, status: 'todo', position: index }))
+            : [];
+
         return {
             institution_id: institutionId,
+            new_institution_name: !institutionId ? (institutionPayload.nom || institutionPayload.name || institutionPayload.sigle || 'Nouvelle Institution') : null,
+            new_institution_website: !institutionId ? (institutionPayload.site_web || institutionPayload.website || null) : null,
             program_name: programName,
             program_type: valueFrom(payload.program_type, payload.type, formationPayload.type) || 'cycle_ingenieur',
             status: 'brouillon',
-            deadline_date: valueFrom(
-                payload.deadline_date,
-                payload.date_limite,
-                payload.concours?.date_limite,
-                payload.concours?.deadline_date
-            ) || null,
+            submission_method: valueFrom(payload.submission_method, payload.mode_candidature, payload.concours?.mode_candidature) || null,
+            portal_url: valueFrom(payload.portal_url, payload.lien_candidature, payload.concours?.lien_candidature) || null,
+            deadline_date: deadlineDate,
             notes: buildNotes(payload),
+            events,
+            checklist_items,
         };
     };
 
+    useEffect(() => {
+        try {
+            const parsed = JSON.parse(jsonText);
+            const payload = buildApplicationPayload(parsed);
+            setPreview(payload);
+            setError('');
+        } catch (err) {
+            setPreview(null);
+        }
+    }, [jsonText, institutions]);
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+        if (!preview) {
+            setError("JSON invalide ou données manquantes.");
+            return;
+        }
+
         setError('');
         setLoading(true);
 
         try {
-            const parsed = JSON.parse(jsonText);
-            const payload = buildApplicationPayload(parsed);
-
-            await axios.post('/api/applications', payload);
+            await axios.post('/api/applications', preview);
             onSuccess();
         } catch (err) {
-            setError(err.response?.data?.message || err.message || "JSON invalide.");
+            setError(err.response?.data?.message || err.message || "Erreur lors de la création.");
         } finally {
             setLoading(false);
         }
@@ -240,17 +271,53 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
                         )}
 
-                        <textarea
-                            value={jsonText}
-                            onChange={(event) => setJsonText(event.target.value)}
-                            rows={12}
-                            spellCheck={false}
-                            className="w-full rounded-lg border border-gray-300 bg-gray-950 p-4 font-mono text-sm text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-
-                        <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
-                            L'import accepte un JSON simple ou detaille. Les champs en plus sont conserves dans les notes
-                            avec le JSON original.
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <textarea
+                                    value={jsonText}
+                                    onChange={(event) => setJsonText(event.target.value)}
+                                    rows={15}
+                                    spellCheck={false}
+                                    className="w-full rounded-lg border border-gray-300 bg-gray-950 p-4 font-mono text-sm text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                />
+                                <div className="mt-2 rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
+                                    L'import accepte un JSON simple ou détaillé. Les événements et documents sont extraits.
+                                </div>
+                            </div>
+                            
+                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 max-h-[22rem] overflow-y-auto">
+                                <h4 className="font-semibold text-gray-700 mb-2">Aperçu</h4>
+                                {preview ? (
+                                    <div className="space-y-3 text-sm">
+                                        <div>
+                                            <span className="font-medium">Institution : </span>
+                                            {preview.institution_id ? (
+                                                <span className="text-green-600">Existante (ID: {preview.institution_id})</span>
+                                            ) : (
+                                                <span className="text-orange-600">Nouvelle : {preview.new_institution_name}</span>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Programme : </span>
+                                            <span>{preview.program_name} ({preview.program_type})</span>
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Evénements ({preview.events.length}) : </span>
+                                            <ul className="list-disc pl-5 mt-1">
+                                                {preview.events.map((e, i) => <li key={i}>{e.title} - {e.event_date}</li>)}
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <span className="font-medium">Documents à préparer ({preview.checklist_items.length}) : </span>
+                                            <ul className="list-disc pl-5 mt-1">
+                                                {preview.checklist_items.map((c, i) => <li key={i}>{c.title}</li>)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-gray-400 italic">JSON invalide ou incomplet pour l'aperçu. Assurez-vous d'avoir au moins un program_name.</div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

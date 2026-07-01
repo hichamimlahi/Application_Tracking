@@ -18,5 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('institutions', InstitutionController::class)->only(['index', 'show']);
     Route::apiResource('applications', ApplicationController::class);
+    Route::apiResource('application-events', \App\Http\Controllers\ApplicationEventController::class)->only(['store', 'update', 'destroy']);
+    Route::apiResource('checklist-items', \App\Http\Controllers\ChecklistItemController::class)->only(['store', 'update', 'destroy']);
     Route::apiResource('documents', DocumentController::class)->only(['store', 'destroy']);
 });

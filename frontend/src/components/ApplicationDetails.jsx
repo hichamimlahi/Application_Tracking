@@ -21,6 +21,9 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
         type: 'cv'
     });
 
+    const [newEvent, setNewEvent] = useState({ type: 'exam', title: '', event_date: '', notes: '' });
+    const [newChecklist, setNewChecklist] = useState({ title: '', status: 'todo' });
+
     useEffect(() => {
         if (applicationId) {
             fetchApplication();
@@ -88,6 +91,60 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
         }
     };
 
+    const handleToggleChecklist = async (item) => {
+        const newStatus = item.status === 'todo' ? 'ready' : (item.status === 'ready' ? 'sent' : 'todo');
+        try {
+            await axios.put(`/api/checklist-items/${item.id}`, { status: newStatus });
+            fetchApplication();
+        } catch (err) {
+            alert("Erreur lors de la mise à jour de l'élément.");
+        }
+    };
+
+    const handleAddChecklist = async (e) => {
+        e.preventDefault();
+        if (!newChecklist.title) return;
+        try {
+            await axios.post('/api/checklist-items', { ...newChecklist, application_id: applicationId });
+            setNewChecklist({ title: '', status: 'todo' });
+            fetchApplication();
+        } catch (err) {
+            alert("Erreur lors de l'ajout.");
+        }
+    };
+
+    const handleDeleteChecklist = async (itemId) => {
+        if (!window.confirm("Supprimer cet élément ?")) return;
+        try {
+            await axios.delete(`/api/checklist-items/${itemId}`);
+            fetchApplication();
+        } catch (err) {
+            alert("Erreur lors de la suppression.");
+        }
+    };
+
+    const handleAddEvent = async (e) => {
+        e.preventDefault();
+        if (!newEvent.title || !newEvent.event_date) return;
+        try {
+            await axios.post('/api/application-events', { ...newEvent, application_id: applicationId });
+            setNewEvent({ type: 'exam', title: '', event_date: '', notes: '' });
+            fetchApplication();
+        } catch (err) {
+            alert("Erreur lors de l'ajout de l'événement.");
+        }
+    };
+
+    const handleDeleteEvent = async (eventId) => {
+        if (!window.confirm("Supprimer cet événement ?")) return;
+        try {
+            await axios.delete(`/api/application-events/${eventId}`);
+            fetchApplication();
+        } catch (err) {
+            alert("Erreur lors de la suppression.");
+        }
+    };
+
     if (loading) {
         return (
             <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -142,7 +199,70 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
                         </div>
 
                         <div className="mt-6 border-t border-gray-200 pt-6">
-                            <h4 className="text-lg font-medium text-gray-900">Détails</h4>
+                            <h4 className="text-lg font-medium text-gray-900">Événements & Dates clés</h4>
+                            <ul className="mt-4 space-y-2">
+                                {application.events?.length === 0 ? (
+                                    <p className="text-sm text-gray-500">Aucun événement.</p>
+                                ) : (
+                                    application.events?.map(event => (
+                                        <li key={event.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                            <div>
+                                                <span className="font-medium text-gray-800">{event.title}</span>
+                                                <span className="ml-2 text-sm text-gray-500">{event.event_date}</span>
+                                                {event.notes && <p className="text-xs text-gray-500 mt-1">{event.notes}</p>}
+                                            </div>
+                                            <button onClick={() => handleDeleteEvent(event.id)} className="text-red-500 hover:text-red-700 text-sm">✖</button>
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                            <form onSubmit={handleAddEvent} className="mt-3 flex gap-2">
+                                <input type="text" placeholder="Titre" required value={newEvent.title} onChange={e => setNewEvent({...newEvent, title: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-sm flex-1" />
+                                <input type="date" required value={newEvent.event_date} onChange={e => setNewEvent({...newEvent, event_date: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-sm" />
+                                <select value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-sm">
+                                    <option value="exam">Concours</option>
+                                    <option value="deadline">Date Limite</option>
+                                    <option value="result">Résultats</option>
+                                    <option value="oral">Oral</option>
+                                    <option value="registration">Inscription</option>
+                                    <option value="other">Autre</option>
+                                </select>
+                                <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Ajouter</button>
+                            </form>
+                        </div>
+
+                        <div className="mt-6 border-t border-gray-200 pt-6">
+                            <h4 className="text-lg font-medium text-gray-900">Checklist (Documents à préparer)</h4>
+                            <ul className="mt-4 space-y-2">
+                                {application.checklist_items?.length === 0 ? (
+                                    <p className="text-sm text-gray-500">Aucune tâche.</p>
+                                ) : (
+                                    application.checklist_items?.map(item => (
+                                        <li key={item.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-lg">
+                                            <label className="flex items-center cursor-pointer flex-1">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={item.status === 'ready' || item.status === 'sent'} 
+                                                    onChange={() => handleToggleChecklist(item)}
+                                                    className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                                                />
+                                                <span className={`ml-3 text-sm ${item.status === 'ready' || item.status === 'sent' ? 'line-through text-gray-400' : 'text-gray-700'}`}>
+                                                    {item.title} {item.status === 'sent' ? '(Envoyé)' : ''}
+                                                </span>
+                                            </label>
+                                            <button onClick={() => handleDeleteChecklist(item.id)} className="text-red-500 hover:text-red-700 text-sm ml-4">✖</button>
+                                        </li>
+                                    ))
+                                )}
+                            </ul>
+                            <form onSubmit={handleAddChecklist} className="mt-3 flex gap-2">
+                                <input type="text" placeholder="Nouveau document/tâche" required value={newChecklist.title} onChange={e => setNewChecklist({...newChecklist, title: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-sm flex-1" />
+                                <button type="submit" className="bg-gray-200 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-300">Ajouter</button>
+                            </form>
+                        </div>
+
+                        <div className="mt-6 border-t border-gray-200 pt-6">
+                            <h4 className="text-lg font-medium text-gray-900">Détails de la candidature</h4>
                             <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
                                 <div>
                                     <dt className="text-sm font-medium text-gray-500">Méthode de soumission</dt>
