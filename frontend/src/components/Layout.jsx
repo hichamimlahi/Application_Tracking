@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
-import { HomeIcon, ViewColumnsIcon, ArrowRightOnRectangleIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, ViewColumnsIcon, ArrowRightOnRectangleIcon, ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 
 const Layout = () => {
     const { user, logout } = useAuth();
@@ -17,6 +17,7 @@ const Layout = () => {
     const navigation = [
         { name: 'Tableau de bord', href: '/', icon: HomeIcon },
         { name: 'Kanban Candidatures', href: '/kanban', icon: ViewColumnsIcon },
+        { name: 'Calendrier', href: '/calendar', icon: CalendarDaysIcon },
     ];
 
     return (

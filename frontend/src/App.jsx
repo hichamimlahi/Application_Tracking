@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Kanban from './pages/Kanban';
+import Calendar from './pages/Calendar';
 
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, loading } = useAuth();
@@ -31,6 +32,7 @@ function App() {
                     }>
                         <Route index element={<Dashboard />} />
                         <Route path="kanban" element={<Kanban />} />
+                        <Route path="calendar" element={<Calendar />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
