@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  db:
+    image: postgres:15
+    container_name: tracking_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-tracking_app}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - tracking-network
+
+  # Application Backend (Laravel - PHP FPM)
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: tracking_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - tracking-network
+
+  # Serveur Web Nginx (pour Laravel)
+  web:
+    image: nginx:alpine
+    container_name: tracking_web
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - tracking-network
+
+  # Frontend (React via Vite)
+  frontend:
+    image: node:20-alpine
+    container_name: tracking_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host
+    networks:
+      - tracking-network
+
+networks:
+  tracking-network:
+    driver: bridge
+
+volumes:
+  db-data:

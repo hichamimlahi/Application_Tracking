@@ -1,0 +1,210 @@
+{
+  "sources": ["cycle-ingenieur-maroc.com", "supmaroc.com", "vérification web"],
+  "annee": "2026-2027",
+  "type": "Écoles publiques d'ingénieurs uniquement",
+  "total": 41,
+  "note_logos": "Logos via Google Favicon API (sz=128). Remplacer par logo officiel si disponible. Logo confirmé pour EMI: https://www.emi.ac.ma/wp-content/uploads/2023/11/logo-emi.png",
+  "ecoles": [
+    {
+      "sigle": "ECC", "nom_complet": "École Centrale Casablanca", "type": "Grande École", "ville": "Casablanca",
+      "site_web": "https://www.centrale-casablanca.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=centrale-casablanca.ma&sz=128"
+    },
+    {
+      "sigle": "EHTP", "nom_complet": "École Hassania des Travaux Publics", "type": "Grande École", "ville": "Casablanca",
+      "site_web": "https://www.ehtp.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ehtp.ac.ma&sz=128"
+    },
+    {
+      "sigle": "EMI", "nom_complet": "École Mohammadia d'Ingénieurs", "type": "Grande École", "ville": "Rabat",
+      "site_web": "https://www.emi.ac.ma",
+      "logo": "https://www.emi.ac.ma/wp-content/uploads/2023/11/logo-emi.png",
+      "logo_favicon": "https://www.google.com/s2/favicons?domain=emi.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENIAD", "nom_complet": "École Nationale de l'Intelligence Artificielle et du Digital", "type": "Grande École", "ville": "Berkane",
+      "site_web": "https://eniad.ump.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=eniad.ump.ma&sz=128"
+    },
+    {
+      "sigle": "ENSC", "nom_complet": "École Nationale Supérieure de Chimie", "type": "Grande École", "ville": "Rabat",
+      "site_web": "https://www.ensc.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensc.ma&sz=128"
+    },
+    {
+      "sigle": "ENSEM", "nom_complet": "École Nationale Supérieure d'Électricité et de Mécanique", "type": "Grande École", "ville": "Casablanca",
+      "site_web": "https://ensem.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensem.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSET", "nom_complet": "École Nationale Supérieure de l'Enseignement Technique", "type": "Grande École", "ville": "Rabat",
+      "site_web": "https://www.enset-rabat.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=enset-rabat.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSIAS", "nom_complet": "École Nationale Supérieure d'Informatique et d'Analyse des Systèmes", "type": "Grande École", "ville": "Rabat",
+      "site_web": "https://www.ensias.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensias.ma&sz=128"
+    },
+    {
+      "sigle": "ENSIASD", "nom_complet": "École Nationale des Sciences Appliquées et d'Ingénierie de Taroudant", "type": "Grande École", "ville": "Taroudant",
+      "site_web": "https://ensiasd.uca.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensiasd.uca.ma&sz=128"
+    },
+    {
+      "sigle": "ENSMR", "nom_complet": "École Nationale Supérieure des Mines de Rabat", "type": "Grande École", "ville": "Rabat",
+      "site_web": "https://www.enim.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=enim.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ESITH", "nom_complet": "École Nationale Supérieure des Industries du Textile et de l'Habillement", "type": "Grande École", "ville": "Casablanca",
+      "site_web": "https://www.esith.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=esith.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENAM", "nom_complet": "École Nationale d'Agriculture de Meknès", "type": "Institut", "ville": "Meknès",
+      "site_web": "https://www.enameknes.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=enameknes.ac.ma&sz=128"
+    },
+    {
+      "sigle": "IAV", "nom_complet": "Institut Agronomique et Vétérinaire Hassan II", "type": "Institut", "ville": "Rabat",
+      "site_web": "https://www.iav.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=iav.ac.ma&sz=128"
+    },
+    {
+      "sigle": "INPT", "nom_complet": "Institut National des Postes et Télécommunications", "type": "Institut", "ville": "Rabat",
+      "site_web": "https://www.inpt.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=inpt.ac.ma&sz=128"
+    },
+    {
+      "sigle": "INSEA", "nom_complet": "Institut National de Statistique et d'Économie Appliquée", "type": "Institut", "ville": "Rabat",
+      "site_web": "https://www.insea.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=insea.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ISEM", "nom_complet": "Institut Supérieur d'Études Maritimes", "type": "Institut", "ville": "Casablanca",
+      "site_web": "https://www.isem.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=isem.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSAM Casa", "nom_complet": "École Nationale Supérieure des Arts et Métiers de Casablanca", "type": "ENSAM", "ville": "Casablanca",
+      "site_web": "https://ensam-casa.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensam-casa.ma&sz=128"
+    },
+    {
+      "sigle": "ENSAM Meknès", "nom_complet": "École Nationale Supérieure des Arts et Métiers de Meknès", "type": "ENSAM", "ville": "Meknès",
+      "site_web": "https://ensam-umi.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensam-umi.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSAM Rabat", "nom_complet": "École Nationale Supérieure des Arts et Métiers de Rabat", "type": "ENSAM", "ville": "Rabat",
+      "site_web": "https://www.ensam.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensam.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Agadir", "nom_complet": "École Nationale des Sciences Appliquées d'Agadir", "type": "ENSA", "ville": "Agadir",
+      "site_web": "https://www.ensa-agadir.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa-agadir.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Al Hoceima", "nom_complet": "École Nationale des Sciences Appliquées d'Al Hoceima", "type": "ENSA", "ville": "Al Hoceima",
+      "site_web": "https://ensa-alhoceima.ump.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa-alhoceima.ump.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Béni Mellal", "nom_complet": "École Nationale des Sciences Appliquées de Béni Mellal", "type": "ENSA", "ville": "Béni Mellal",
+      "site_web": "https://ensabm.usms.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensabm.usms.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Berrechid", "nom_complet": "École Nationale des Sciences Appliquées de Berrechid", "type": "ENSA", "ville": "Berrechid",
+      "site_web": "https://ensa.uh1.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa.uh1.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA El Jadida", "nom_complet": "École Nationale des Sciences Appliquées d'El Jadida", "type": "ENSA", "ville": "El Jadida",
+      "site_web": "https://www.ensaeljadida.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensaeljadida.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Fès", "nom_complet": "École Nationale des Sciences Appliquées de Fès", "type": "ENSA", "ville": "Fès",
+      "site_web": "https://ensaf.usmba.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensaf.usmba.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Kénitra", "nom_complet": "École Nationale des Sciences Appliquées de Kénitra", "type": "ENSA", "ville": "Kénitra",
+      "site_web": "https://ensa.uit.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa.uit.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Khouribga", "nom_complet": "École Nationale des Sciences Appliquées de Khouribga", "type": "ENSA", "ville": "Khouribga",
+      "site_web": "https://ensk.uh1.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensk.uh1.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Marrakech", "nom_complet": "École Nationale des Sciences Appliquées de Marrakech", "type": "ENSA", "ville": "Marrakech",
+      "site_web": "https://www.ensa-marrakech.uca.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa-marrakech.uca.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Oujda", "nom_complet": "École Nationale des Sciences Appliquées d'Oujda", "type": "ENSA", "ville": "Oujda",
+      "site_web": "https://ensa.univ-oujda.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa.univ-oujda.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Safi", "nom_complet": "École Nationale des Sciences Appliquées de Safi", "type": "ENSA", "ville": "Safi",
+      "site_web": "https://www.ensas.uca.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensas.uca.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Tanger", "nom_complet": "École Nationale des Sciences Appliquées de Tanger", "type": "ENSA", "ville": "Tanger",
+      "site_web": "https://www.ensat.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensat.ac.ma&sz=128"
+    },
+    {
+      "sigle": "ENSA Tétouan", "nom_complet": "École Nationale des Sciences Appliquées de Tétouan", "type": "ENSA", "ville": "Tétouan",
+      "site_web": "https://ensa.uae.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=ensa.uae.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Al Hoceima", "nom_complet": "Faculté des Sciences et Techniques d'Al Hoceima", "type": "FST", "ville": "Al Hoceima",
+      "site_web": "https://fsth.ump.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fsth.ump.ma&sz=128"
+    },
+    {
+      "sigle": "FST Béni Mellal", "nom_complet": "Faculté des Sciences et Techniques de Béni Mellal", "type": "FST", "ville": "Béni Mellal",
+      "site_web": "https://fstbm.usms.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fstbm.usms.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Errachidia", "nom_complet": "Faculté des Sciences et Techniques d'Errachidia", "type": "FST", "ville": "Errachidia",
+      "site_web": "https://fste.umi.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fste.umi.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Fès", "nom_complet": "Faculté des Sciences et Techniques de Fès", "type": "FST", "ville": "Fès",
+      "site_web": "https://www.fst-usmba.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fst-usmba.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Marrakech", "nom_complet": "Faculté des Sciences et Techniques de Marrakech", "type": "FST", "ville": "Marrakech",
+      "site_web": "https://fstg-marrakech.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fstg-marrakech.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Mohammedia", "nom_complet": "Faculté des Sciences et Techniques de Mohammedia", "type": "FST", "ville": "Mohammedia",
+      "site_web": "https://www.fstm.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fstm.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Settat", "nom_complet": "Faculté des Sciences et Techniques de Settat", "type": "FST", "ville": "Settat",
+      "site_web": "https://www.fsts.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fsts.ac.ma&sz=128"
+    },
+    {
+      "sigle": "FST Tanger", "nom_complet": "Faculté des Sciences et Techniques de Tanger", "type": "FST", "ville": "Tanger",
+      "site_web": "https://fstt.ac.ma",
+      "logo": "https://www.google.com/s2/favicons?domain=fstt.ac.ma&sz=128"
+    }
+  ]
+}
