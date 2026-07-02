@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../lib/axios';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { PlusIcon, ViewColumnsIcon, DocumentArrowUpIcon, AcademicCapIcon, TrophyIcon, EyeIcon, MagnifyingGlassIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, ViewColumnsIcon, DocumentArrowUpIcon, AcademicCapIcon, TrophyIcon, EyeIcon, MagnifyingGlassIcon, BuildingLibraryIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import ApplicationForm from '../components/ApplicationForm';
 import ApplicationDetails from '../components/ApplicationDetails';
 import JsonApplicationImport from '../components/JsonApplicationImport';
@@ -288,7 +288,11 @@ const Kanban = () => {
                                                                     <img src={app.institution.logo} alt="" className="w-6 h-6 rounded-md object-contain bg-white dark:bg-gray-800 flex-shrink-0 shadow-sm border border-gray-100 dark:border-gray-700" />
                                                                 ) : (
                                                                     <span className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 flex items-center justify-center flex-shrink-0">
-                                                                        <BuildingLibraryIcon className="w-4 h-4" />
+                                                                        {app.program_type === 'master' ? (
+                                                                            <BuildingOfficeIcon className="w-4 h-4" />
+                                                                        ) : (
+                                                                            <BuildingLibraryIcon className="w-4 h-4" />
+                                                                        )}
                                                                     </span>
                                                                 )}
                                                                 <div className="font-bold text-gray-800 dark:text-gray-100 leading-tight text-[13px] line-clamp-1">
