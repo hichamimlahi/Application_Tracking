@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../lib/axios';
 import { format, isAfter, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ChartBarIcon, ClockIcon, CheckCircleIcon, XCircleIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon, ClockIcon, CheckCircleIcon, XCircleIcon, PlusIcon, BuildingLibraryIcon } from '@heroicons/react/24/outline';
 import ApplicationForm from '../components/ApplicationForm';
 import ApplicationDetails from '../components/ApplicationDetails';
 import JsonApplicationImport from '../components/JsonApplicationImport';
@@ -169,7 +169,7 @@ const Dashboard = () => {
                                                 <img src={app.institution.logo} alt="" className="h-10 w-10 rounded-full object-contain bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700 p-0.5" />
                                             ) : (
                                                 <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-bold shadow-sm">
-                                                    {app.institution?.acronym?.substring(0,2) || app.institution?.name?.substring(0, 2).toUpperCase()}
+                                                    <BuildingLibraryIcon className="w-5 h-5" />
                                                 </span>
                                             )}
                                         </div>

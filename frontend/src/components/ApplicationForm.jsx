@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../lib/axios';
+import { BuildingLibraryIcon } from '@heroicons/react/24/outline';
 
 const STATUSES = [
     { id: 'brouillon', name: 'Brouillon / Annonce' },
@@ -132,8 +133,8 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                                             {institutions.find(i => i.id == formData.institution_id)?.logo ? (
                                                                 <img src={institutions.find(i => i.id == formData.institution_id).logo} alt="" className="flex-shrink-0 h-6 w-6 rounded-md mr-3 object-contain bg-white dark:bg-gray-800" />
                                                             ) : (
-                                                                <span className="flex-shrink-0 h-6 w-6 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400 mr-3">
-                                                                    {institutions.find(i => i.id == formData.institution_id)?.acronym?.substring(0,2) || '??'}
+                                                                <span className="flex items-center justify-center h-6 w-6 rounded-md mr-3 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 flex-shrink-0">
+                                                                    <BuildingLibraryIcon className="w-4 h-4" />
                                                                 </span>
                                                             )}
                                                             <span className="block truncate">{institutions.find(i => i.id == formData.institution_id)?.name}</span>
@@ -164,8 +165,8 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                                                 {inst.logo ? (
                                                                     <img src={inst.logo} alt="" className="flex-shrink-0 h-6 w-6 rounded-md object-contain bg-white dark:bg-gray-800" />
                                                                 ) : (
-                                                                    <span className="flex-shrink-0 h-6 w-6 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400">
-                                                                        {inst.acronym?.substring(0,2) || inst.name.substring(0,2)}
+                                                                    <span className="flex items-center justify-center h-6 w-6 rounded-md bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 flex-shrink-0">
+                                                                        <BuildingLibraryIcon className="w-4 h-4" />
                                                                     </span>
                                                                 )}
                                                                 <span className="ml-3 block truncate font-medium">
