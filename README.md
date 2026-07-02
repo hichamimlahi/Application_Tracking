@@ -2,8 +2,13 @@
 
 ## 🎯 Objectif du projet
 Cette application permet aux étudiants de suivre et de gérer efficacement leurs candidatures pour le Cycle d'Ingénieur ou les Masters.
-Au lieu de simples notes, l'application structure les candidatures avec des événements précis (dates limites, concours, résultats), une checklist de documents à fournir et un suivi global des statuts. 
-L'objectif est d'avoir un outil clair, qui rappelle les échéances et garantit qu'aucune candidature n'est oubliée ou incomplète.
+L'application propose un suivi visuel (Kanban), un calendrier dynamique et une gestion détaillée (épreuves, pièces jointes, notes) pour s'assurer qu'aucune candidature n'est oubliée ou incomplète.
+
+## ✨ Fonctionnalités Principales
+- **Tableau Kanban Interactif** : Suivez vos candidatures par étapes (Brouillon, Dépôt, Concours, Résultats) avec un simple glisser-déposer (Drag & Drop).
+- **Import Intelligent par JSON** : Copiez-collez un texte d'annonce généré par IA, l'application extrait automatiquement les écoles, dates, épreuves et documents requis.
+- **Calendrier Dynamique** : Visualisez toutes les dates importantes (limites, écrits, oraux, inscriptions) avec des filtres par école et par type de formation.
+- **Gestion des Pièces Jointes** : Espace dédié au Drag & Drop pour ajouter vos reçus de préinscription et documents PDF/Images directement sur chaque candidature.
 
 ## ⚙️ Installation Docker
 
@@ -17,7 +22,7 @@ L'application est conçue pour être lancée facilement avec Docker :
    ```
 4. Les migrations de la base de données peuvent être lancées avec :
    ```bash
-   docker-compose exec backend php artisan migrate --seed
+   docker exec tracking_app php artisan migrate:fresh --seed
    ```
 5. Accédez au frontend sur `http://localhost:5173` (ou port configuré) et l'API sur `http://localhost:8000`.
 
@@ -27,19 +32,18 @@ Après avoir exécuté les seeders (avec la commande ci-dessus), vous pouvez vou
 - **Email** : test@test.com
 - **Mot de passe** : password
 
-## 📁 Structure Backend / Frontend
+## 🤖 Prompt JSON pour ChatGPT / Claude / Gemini
 
-- **`/backend`** : Application Laravel. Fournit une API REST sécurisée par Sanctum. Contient les modèles (`Application`, `Institution`, `ApplicationEvent`, `ChecklistItem`, `Document`).
-- **`/frontend`** : Application React + Vite + TailwindCSS. Communique avec l'API. Contient le tableau de bord, le calendrier et le suivi des candidatures.
+Pour importer très rapidement une annonce, copiez ce prompt dans une IA avec le texte du concours. Le JSON généré pourra être copié directement dans le bouton **"Importer JSON"** de l'application !
 
-## 🤖 Prompt JSON pour ChatGPT
-
-Vous pouvez utiliser ChatGPT pour convertir n'importe quelle annonce de concours ou master en un JSON structuré, prêt à être importé dans l'application.
-Copiez ce prompt dans ChatGPT avec le texte de l'annonce :
-
-> Je vais te donner une annonce de concours ou d'admission en master.
-> Extrais les informations et retourne-les **strictement** au format JSON suivant. Ne réponds rien d'autre que le JSON.
+> **Prompt :**
+> Transforme ce texte d'annonce de concours pour une école d'ingénieur/master en un fichier JSON strict. Ne réponds rien d'autre que le JSON.
 > 
+> **Instructions pour les DATES et les ÉPREUVES :**
+> - Pour CHAQUE date trouvée (limite, preselection, concours, oral, entretien, inscription, etc.), crée une clé `date_NOM` avec la valeur `AAAA-MM-JJ` (ex: `"date_concours": "2026-07-15"`).
+> - Si l'épreuve a des matières, horaires ou détails, crée une clé `details_NOM` juste en dessous (ex: `"details_concours": "Maths 8h-12h"`).
+> 
+> **Exemple de structure attendue :**
 > ```json
 > {
 >   "institution": {
@@ -52,11 +56,14 @@ Copiez ce prompt dans ChatGPT avec le texte de l'annonce :
 >     "type": "cycle_ingenieur ou master"
 >   },
 >   "concours": {
->     "date_limite": "YYYY-MM-DD",
->     "date_preselection": "YYYY-MM-DD",
->     "date_concours": "YYYY-MM-DD",
->     "date_resultats": "YYYY-MM-DD",
->     "mode_candidature": "en_ligne ou papier",
+>     "titre": "Titre de l'annonce",
+>     "date_limite": "2026-07-10",
+>     "date_concours": "2026-07-15",
+>     "details_concours": "Écrit pour toutes les filières",
+>     "date_entretien": "2026-07-21",
+>     "details_entretien": "Uniquement pour Génie Civil",
+>     "date_inscription_principale": "2026-07-22",
+>     "mode_candidature": "En ligne puis dépôt papier le jour de l'écrit",
 >     "lien_candidature": "URL d'inscription"
 >   },
 >   "documents": [
@@ -64,17 +71,9 @@ Copiez ce prompt dans ChatGPT avec le texte de l'annonce :
 >     "Relevés de notes",
 >     "CV"
 >   ],
->   "notes": "Remarques complémentaires."
+>   "notes": "Toute information complémentaire."
 > }
 > ```
 > Voici l'annonce : [Collez l'annonce ici]
 
-## 📥 Workflow d'import d'annonce
-
-1. Cliquez sur **Importer JSON** depuis le tableau de bord.
-2. Collez le JSON généré par ChatGPT.
-3. L'application lira le JSON et affichera un **Aperçu**.
-4. Si l'institution n'existe pas, elle sera créée automatiquement.
-5. Les dates limites, concours et résultats seront convertis en **Événements**.
-6. Les documents seront ajoutés sous forme de **Checklist** (à faire).
-7. Cliquez sur "Créer la candidature" pour valider l'import. Vous pourrez ensuite ajuster les détails depuis la vue détaillée de la candidature.
+L'application lira dynamiquement n'importe quelle clé commençant par `date_` et `details_` pour générer le calendrier de manière intelligente !
