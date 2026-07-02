@@ -213,6 +213,13 @@ const Calendar = () => {
         return parseISO(event.date) >= today;
     }).slice(0, 8);
 
+    const updateFilterSingle = (name, value) => {
+        setFilters((current) => ({
+            ...current,
+            [name]: value === 'all' ? [] : [value],
+        }));
+    };
+
     const toggleFilter = (category, value) => {
         setFilters(prev => {
             const current = prev[category];
@@ -279,6 +286,19 @@ const Calendar = () => {
                     </label>
 
                     <button
+                        onClick={() => setIsFilterPanelOpen(true)}
+                        className="inline-flex items-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors mr-2"
+                    >
+                        <FunnelIcon className="h-5 w-5" />
+                        <span className="hidden sm:inline">Avancés</span>
+                        {activeFiltersCount > 0 && (
+                            <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold text-blue-700 dark:text-blue-400">
+                                {activeFiltersCount}
+                            </span>
+                        )}
+                    </button>
+
+                    <button
                         type="button"
                         onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
                         className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 text-gray-600 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -303,37 +323,78 @@ const Calendar = () => {
                 </div>
             </div>
 
-            <div className="mb-6 flex flex-wrap items-center gap-2">
-                <button
-                    onClick={() => setIsFilterPanelOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-5 items-center mb-6">
+                <select
+                    value={filters.institutionIds.length === 1 ? filters.institutionIds[0] : 'all'}
+                    onChange={(event) => updateFilterSingle('institutionIds', event.target.value)}
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
                 >
-                    <FunnelIcon className="h-5 w-5" />
-                    Filtres
-                    {activeFiltersCount > 0 && (
-                        <span className="ml-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold text-blue-700 dark:text-blue-400">
-                            {activeFiltersCount}
-                        </span>
-                    )}
-                </button>
-                
-                {Object.entries(filters).map(([category, values]) => (
-                    values.map(value => (
-                        <span key={`${category}-${value}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-                            {getFilterLabel(category, value)}
-                            <button onClick={() => removeFilter(category, value)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                                <XMarkIcon className="h-4 w-4" />
-                            </button>
-                        </span>
-                    ))
-                ))}
-                
-                {activeFiltersCount > 0 && (
+                    <option value="all">Toutes les écoles</option>
+                    {uniqueInstitutions.map((inst) => (
+                        <option key={inst.id} value={inst.id}>{inst.name}</option>
+                    ))}
+                </select>
+
+                <select
+                    value={filters.programTypes.length === 1 ? filters.programTypes[0] : 'all'}
+                    onChange={(event) => updateFilterSingle('programTypes', event.target.value)}
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
+                >
+                    <option value="all">Toutes les formations</option>
+                    <option value="cycle_ingenieur">Cycle d'ingénieur</option>
+                    <option value="master">Master</option>
+                </select>
+
+                <select
+                    value={filters.admissionTypes.length === 1 ? filters.admissionTypes[0] : 'all'}
+                    onChange={(event) => updateFilterSingle('admissionTypes', event.target.value)}
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
+                >
+                    <option value="all">Toutes les admissions</option>
+                    <option value="sur_titre">Sur Titre</option>
+                    <option value="sur_concours">Sur Concours</option>
+                </select>
+
+                <select
+                    value={filters.statuses.length === 1 ? filters.statuses[0] : 'all'}
+                    onChange={(event) => updateFilterSingle('statuses', event.target.value)}
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
+                >
+                    <option value="all">Tous les statuts</option>
+                    {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>{label}</option>
+                    ))}
+                </select>
+
+                <select
+                    value={filters.eventTypes.length === 1 ? filters.eventTypes[0] : 'all'}
+                    onChange={(event) => updateFilterSingle('eventTypes', event.target.value)}
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
+                >
+                    <option value="all">Toutes les dates</option>
+                    {Object.entries(EVENT_TYPES).map(([value, info]) => (
+                        <option key={value} value={value}>{info.label}</option>
+                    ))}
+                </select>
+            </div>
+
+            {activeFiltersCount > 0 && (
+                <div className="mb-6 flex flex-wrap items-center gap-2">
+                    {Object.entries(filters).map(([category, values]) => (
+                        values.map(value => (
+                            <span key={`${category}-${value}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
+                                {getFilterLabel(category, value)}
+                                <button onClick={() => removeFilter(category, value)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                    <XMarkIcon className="h-4 w-4" />
+                                </button>
+                            </span>
+                        ))
+                    ))}
                     <button onClick={clearFilters} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline ml-2">
                         Tout effacer
                     </button>
-                )}
-            </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
                 <section className="overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
