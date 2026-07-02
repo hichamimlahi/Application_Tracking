@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react';
 import axios from '../lib/axios';
 
 const STATUSES = [
-    { id: 'brouillon', name: 'Brouillon' },
-    { id: 'soumis', name: 'Soumis' },
-    { id: 'concours', name: 'Concours' },
-    { id: 'attente', name: 'En Attente' },
-    { id: 'accepte', name: 'Accepté' },
-    { id: 'refuse', name: 'Refusé' },
+    { id: 'brouillon', name: 'Brouillon / Annonce' },
+    { id: 'non_eligible', name: 'Non éligible' },
+    { id: 'soumis', name: 'Postulé' },
+    { id: 'preselectionne', name: 'Présélectionné' },
+    { id: 'non_preselectionne', name: 'Non présélectionné' },
+    { id: 'admis_oral', name: 'Admis à l\'Oral' },
+    { id: 'refuse_ecrit', name: 'Refusé à l\'Écrit' },
+    { id: 'accepte', name: 'Admis Final' },
+    { id: 'liste_attente', name: 'Liste d\'Attente' },
+    { id: 'refuse_final', name: 'Refusé Final' },
 ];
 
 const SUBMISSION_METHODS = [

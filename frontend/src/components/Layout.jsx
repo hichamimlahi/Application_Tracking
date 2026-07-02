@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
-import { HomeIcon, ViewColumnsIcon, ArrowRightOnRectangleIcon, ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { HomeIcon, ViewColumnsIcon, ArrowRightOnRectangleIcon, ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, PlusIcon } from '@heroicons/react/24/outline';
+import JsonApplicationImport from './JsonApplicationImport';
 
 const Layout = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
+    const [showJsonImport, setShowJsonImport] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -63,6 +65,15 @@ const Layout = () => {
                 </div>
 
                 <div className={`p-4 border-t border-gray-100 ${collapsed ? 'px-2' : ''}`}>
+                    <button
+                        onClick={() => setShowJsonImport(true)}
+                        title={collapsed ? "Importer JSON" : ""}
+                        className={`w-full flex items-center mb-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 bg-blue-50/50 text-blue-700 border border-blue-100 hover:bg-blue-50 ${collapsed ? 'justify-center px-0' : 'px-4'}`}
+                    >
+                        <PlusIcon className={`${collapsed ? 'mx-0' : 'mr-3'} h-5 w-5 flex-shrink-0 text-blue-600`} />
+                        {!collapsed && <span className="whitespace-nowrap">Importer JSON</span>}
+                    </button>
+
                     {!collapsed ? (
                         <div className="flex items-center p-4 bg-gray-50 rounded-xl mb-4">
                             <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg">
@@ -98,6 +109,13 @@ const Layout = () => {
                     <Outlet />
                 </main>
             </div>
+
+            {showJsonImport && (
+                <JsonApplicationImport
+                    onClose={() => setShowJsonImport(false)}
+                    onSuccess={() => { setShowJsonImport(false); window.location.reload(); }}
+                />
+            )}
         </div>
     );
 };

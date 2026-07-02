@@ -43,7 +43,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
     const [jsonText, setJsonText] = useState(SAMPLE_JSON);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [preview, setPreview] = useState(null);
+    const [previews, setPreviews] = useState([]);
 
     useEffect(() => {
         const fetchInstitutions = async () => {
@@ -120,12 +120,22 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
         if (mdMatch) {
             clean = mdMatch[1];
         }
-        clean = clean.trim();
-        if (!clean) return null;
-        if (!/^https?:\/\//i.test(clean)) {
-            clean = 'https://' + clean;
+        
+        // Extract the first word that looks like a domain/url
+        const words = clean.split(/[\s,;]+/);
+        let firstUrl = words.find(w => w.includes('.'));
+        if (!firstUrl) return null;
+        
+        if (!/^https?:\/\//i.test(firstUrl)) {
+            firstUrl = 'https://' + firstUrl;
         }
-        return clean;
+        
+        try {
+            new URL(firstUrl);
+            return firstUrl;
+        } catch {
+            return null;
+        }
     };
 
     const mapSubmissionMethod = (methodStr) => {
@@ -134,7 +144,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
         if (normalized.includes('enligne') || normalized.includes('internet') || normalized.includes('web')) {
             return 'en_ligne';
         }
-        if (normalized.includes('papier') || normalized.includes('courrier') || normalized.includes('poste')) {
+        if (normalized.includes('papier') || normalized.includes('courrier') || normalized.includes('poste') || normalized.includes('postal')) {
             return 'papier';
         }
         return null;
@@ -210,13 +220,66 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
         ) || null;
 
         const events = [];
-        if (deadlineDate) events.push({ type: 'deadline', title: 'Date limite', event_date: deadlineDate });
-        const preselectionDate = valueFrom(payload.date_preselection, payload.concours?.date_preselection);
-        if (preselectionDate) events.push({ type: 'preselection', title: 'Présélection', event_date: preselectionDate });
-        const examDate = valueFrom(payload.date_concours, payload.concours?.date_concours);
-        if (examDate) events.push({ type: 'exam', title: 'Concours', event_date: examDate });
-        const resultDate = valueFrom(payload.date_resultats, payload.concours?.date_resultats);
-        if (resultDate) events.push({ type: 'result', title: 'Résultats', event_date: resultDate });
+        
+        // Dynamic extraction of any YYYY-MM-DD date in the JSON
+        const extractDates = (obj, prefix = '') => {
+            if (!obj || typeof obj !== 'object') return;
+            for (const [key, value] of Object.entries(obj)) {
+                if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+                    const lkey = key.toLowerCase();
+                    let type = 'other';
+                    let title = key.replace(/date_/i, '').replace(/_/g, ' ');
+                    title = title.charAt(0).toUpperCase() + title.slice(1);
+                    
+                    if (lkey.includes('limite') || lkey.includes('deadline')) {
+                        type = 'deadline';
+                        title = 'Date limite';
+                    } else if (lkey.includes('preselection') || lkey.includes('admissibilite')) {
+                        type = 'preselection';
+                        title = 'Présélection';
+                    } else if (lkey.includes('concours') || lkey.includes('ecrit') || lkey.includes('exam')) {
+                        type = 'exam';
+                        if (!lkey.includes('ecrit')) title = 'Concours';
+                    } else if (lkey.includes('resultat') || lkey.includes('admis')) {
+                        type = 'result';
+                        title = 'Résultats';
+                    } else if (lkey.includes('oral') || lkey.includes('entretien')) {
+                        type = 'oral';
+                        title = 'Entretien / Oral';
+                    } else if (lkey.includes('inscription') || lkey.includes('registration')) {
+                        type = 'registration';
+                    }
+                    
+                    // Extract specific details if available
+                    let notes = '';
+                    const baseKey = key.replace(/date_/i, '');
+                    notes = obj[`details_${baseKey}`] || obj[`notes_${baseKey}`] || '';
+                    if (!notes && type === 'exam') {
+                        notes = formatValue(obj.epreuves || obj.epreuve || '');
+                    }
+                    if (!notes && type === 'oral') {
+                        notes = formatValue(obj.details_oral || obj.details_entretien || obj.epreuves_oral || '');
+                    }
+                    if (!notes && typeof obj[baseKey] === 'string' && obj[baseKey] !== value) {
+                        notes = obj[baseKey];
+                    }
+                    
+                    // Prevent duplicates
+                    if (!events.some(e => e.event_date === value.trim() && e.type === type)) {
+                        events.push({ type, title: title || 'Date importante', event_date: value.trim(), notes: String(notes).trim() });
+                    }
+                } else if (typeof value === 'object') {
+                    extractDates(value, key);
+                }
+            }
+        };
+
+        extractDates(payload);
+
+        // Ensure deadline_date is set correctly if it was mapped via other keys
+        if (!events.some(e => e.type === 'deadline') && deadlineDate) {
+            events.push({ type: 'deadline', title: 'Date limite', event_date: deadlineDate });
+        }
 
         const documents = payload.documents || payload.documents_requis || payload.concours?.documents || [];
         const checklist_items = Array.isArray(documents) 
@@ -231,7 +294,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
             program_name: programName,
             program_type: valueFrom(payload.program_type, payload.type, formationPayload.type) || 'cycle_ingenieur',
             status: 'brouillon',
-            submission_method: mapSubmissionMethod(valueFrom(payload.submission_method, payload.mode_candidature, payload.concours?.mode_candidature)),
+            submission_method: mapSubmissionMethod(valueFrom(payload.submission_method, payload.mode_candidature, payload.concours?.mode_candidature)) || 'en_ligne',
             portal_url: cleanUrl(valueFrom(payload.portal_url, payload.lien_candidature, payload.concours?.lien_candidature)),
             deadline_date: deadlineDate,
             notes: buildNotes(payload),
@@ -242,18 +305,21 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
 
     useEffect(() => {
         try {
-            const parsed = JSON.parse(jsonText);
-            const payload = buildApplicationPayload(parsed);
-            setPreview(payload);
+            let parsed = JSON.parse(jsonText);
+            if (!Array.isArray(parsed)) {
+                parsed = [parsed];
+            }
+            const payloads = parsed.map(p => buildApplicationPayload(p));
+            setPreviews(payloads);
             setError('');
         } catch (err) {
-            setPreview(null);
+            setPreviews([]);
         }
     }, [jsonText, institutions]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!preview) {
+        if (!previews || previews.length === 0) {
             setError("JSON invalide ou données manquantes.");
             return;
         }
@@ -262,10 +328,12 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
         setLoading(true);
 
         try {
-            await axios.post('/api/applications', preview);
+            for (const payload of previews) {
+                await axios.post('/api/applications', payload);
+            }
             onSuccess();
         } catch (err) {
-            setError(err.response?.data?.message || err.message || "Erreur lors de la création.");
+            setError(err.response?.data?.message || err.message || "Erreur lors de la création d'une des candidatures.");
         } finally {
             setLoading(false);
         }
@@ -316,33 +384,28 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                             </div>
                             
                             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 max-h-[22rem] overflow-y-auto">
-                                <h4 className="font-semibold text-gray-700 mb-2">Aperçu</h4>
-                                {preview ? (
-                                    <div className="space-y-3 text-sm">
-                                        <div>
-                                            <span className="font-medium">Institution : </span>
-                                            {preview.institution_id ? (
-                                                <span className="text-green-600">Existante (ID: {preview.institution_id})</span>
-                                            ) : (
-                                                <span className="text-orange-600">Nouvelle : {preview.new_institution_name}</span>
-                                            )}
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Programme : </span>
-                                            <span>{preview.program_name} ({preview.program_type})</span>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Evénements ({preview.events.length}) : </span>
-                                            <ul className="list-disc pl-5 mt-1">
-                                                {preview.events.map((e, i) => <li key={i}>{e.title} - {e.event_date}</li>)}
-                                            </ul>
-                                        </div>
-                                        <div>
-                                            <span className="font-medium">Documents à préparer ({preview.checklist_items.length}) : </span>
-                                            <ul className="list-disc pl-5 mt-1">
-                                                {preview.checklist_items.map((c, i) => <li key={i}>{c.title}</li>)}
-                                            </ul>
-                                        </div>
+                                <h4 className="font-semibold text-gray-700 mb-2">Aperçu ({previews.length} candidature{previews.length > 1 ? 's' : ''})</h4>
+                                {previews.length > 0 ? (
+                                    <div className="space-y-6">
+                                        {previews.map((preview, index) => (
+                                            <div key={index} className="space-y-3 text-sm pb-4 border-b border-gray-200 last:border-0 last:pb-0">
+                                                <div>
+                                                    <span className="font-medium">Institution : </span>
+                                                    {preview.institution_id ? (
+                                                        <span className="text-green-600">Existante (ID: {preview.institution_id})</span>
+                                                    ) : (
+                                                        <span className="text-orange-600">Nouvelle : {preview.new_institution_name}</span>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <span className="font-medium">Programme : </span>
+                                                    <span>{preview.program_name} ({preview.program_type})</span>
+                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    {preview.events.length} événement(s), {preview.checklist_items.length} document(s) à préparer.
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : (
                                     <div className="text-gray-400 italic">JSON invalide ou incomplet pour l'aperçu. Assurez-vous d'avoir au moins un program_name.</div>
@@ -363,7 +426,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                                 disabled={loading}
                                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
                             >
-                                {loading ? 'Creation...' : 'Creer la candidature'}
+                                {loading ? 'Création...' : (previews.length > 1 ? `Créer ${previews.length} candidatures` : 'Créer la candidature')}
                             </button>
                         </div>
                     </form>

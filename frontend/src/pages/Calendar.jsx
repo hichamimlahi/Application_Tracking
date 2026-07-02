@@ -28,9 +28,11 @@ const getAcronym = (name) => {
 
 const EVENT_TYPES = {
     deadline: { label: 'Date limite', color: 'bg-red-100 text-red-700 border-red-200', dot: 'bg-red-500' },
-    exam: { label: 'Concours', color: 'bg-purple-100 text-purple-700 border-purple-200', dot: 'bg-purple-500' },
+    exam: { label: 'Concours / Écrit', color: 'bg-purple-100 text-purple-700 border-purple-200', dot: 'bg-purple-500' },
     preselection: { label: 'Présélection', color: 'bg-orange-100 text-orange-700 border-orange-200', dot: 'bg-orange-500' },
-    result: { label: 'Resultats', color: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500' },
+    oral: { label: 'Entretien / Oral', color: 'bg-teal-100 text-teal-700 border-teal-200', dot: 'bg-teal-500' },
+    result: { label: 'Résultats / Admis', color: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500' },
+    registration: { label: 'Inscription', color: 'bg-indigo-100 text-indigo-700 border-indigo-200', dot: 'bg-indigo-500' },
     other: { label: 'Autre date', color: 'bg-blue-100 text-blue-700 border-blue-200', dot: 'bg-blue-500' },
 };
 
@@ -123,7 +125,9 @@ const Calendar = () => {
         programType: 'all',
         status: 'all',
         eventType: 'all',
+        institutionId: 'all',
     });
+    const [hideRejected, setHideRejected] = useState(false);
 
     useEffect(() => {
         const fetchApplications = async () => {
@@ -147,9 +151,18 @@ const Calendar = () => {
             if (filters.programType !== 'all' && event.programType !== filters.programType) return false;
             if (filters.status !== 'all' && event.status !== filters.status) return false;
             if (filters.eventType !== 'all' && event.type !== filters.eventType) return false;
+            if (filters.institutionId !== 'all' && event.institution?.id?.toString() !== filters.institutionId) return false;
+            
+            if (hideRejected) {
+                const rejectedStatuses = ['non_eligible', 'non_preselectionne', 'refuse_ecrit', 'refuse_final'];
+                if (rejectedStatuses.includes(event.status)) {
+                    return false;
+                }
+            }
+            
             return true;
         });
-    }, [allEvents, filters]);
+    }, [allEvents, filters, hideRejected]);
 
     const monthDays = useMemo(() => {
         const monthStart = startOfMonth(currentMonth);
@@ -159,6 +172,18 @@ const Calendar = () => {
             end: endOfWeek(monthEnd, { weekStartsOn: 1 }),
         });
     }, [currentMonth]);
+
+    const uniqueInstitutions = useMemo(() => {
+        const map = new Map();
+        applications.forEach(app => {
+            if (app.institution) {
+                map.set(app.institution.id.toString(), app.institution.acronym || app.institution.name);
+            }
+        });
+        return Array.from(map.entries())
+            .map(([id, name]) => ({ id, name }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    }, [applications]);
 
     const monthEvents = filteredEvents.filter((event) => isSameMonth(parseISO(event.date), currentMonth));
     const upcomingEvents = filteredEvents.filter((event) => parseISO(event.date) >= startOfMonth(currentMonth)).slice(0, 8);
@@ -205,14 +230,25 @@ const Calendar = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-5 items-center mb-6">
+                <select
+                    value={filters.institutionId}
+                    onChange={(event) => updateFilter('institutionId', event.target.value)}
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                >
+                    <option value="all">Toutes les écoles</option>
+                    {uniqueInstitutions.map((inst) => (
+                        <option key={inst.id} value={inst.id}>{inst.name}</option>
+                    ))}
+                </select>
+
                 <select
                     value={filters.programType}
                     onChange={(event) => updateFilter('programType', event.target.value)}
                     className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
                 >
                     <option value="all">Toutes les formations</option>
-                    <option value="cycle_ingenieur">Cycles d'ingenieur</option>
+                    <option value="cycle_ingenieur">Cycles d'ingénieur</option>
                     <option value="master">Masters</option>
                 </select>
 
@@ -237,6 +273,24 @@ const Calendar = () => {
                         <option key={value} value={value}>{info.label}</option>
                     ))}
                 </select>
+
+                <div className="flex items-center md:justify-end">
+                    <label className="flex items-center cursor-pointer group">
+                        <div className="relative">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only" 
+                                checked={hideRejected} 
+                                onChange={(e) => setHideRejected(e.target.checked)} 
+                            />
+                            <div className={`block w-10 h-6 rounded-full transition-colors ${hideRejected ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${hideRejected ? 'transform translate-x-4' : ''}`}></div>
+                        </div>
+                        <div className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
+                            Masquer les refus
+                        </div>
+                    </label>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">

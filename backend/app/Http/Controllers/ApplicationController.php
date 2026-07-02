@@ -12,7 +12,7 @@ class ApplicationController extends Controller
     public function index(Request $request)
     {
         $applications = $request->user()->applications()
-            ->with(['institution', 'events', 'checklistItems'])
+            ->with(['institution', 'events', 'checklistItems', 'documents'])
             ->orderBy('deadline_date', 'asc')
             ->get();
 

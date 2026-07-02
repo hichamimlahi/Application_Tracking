@@ -54,8 +54,8 @@ const Dashboard = () => {
     const stats = {
         total: filteredApplications.length,
         accepted: filteredApplications.filter(a => a.status === 'accepte').length,
-        waiting: filteredApplications.filter(a => ['soumis', 'concours', 'attente'].includes(a.status)).length,
-        rejected: filteredApplications.filter(a => a.status === 'refuse').length,
+        waiting: filteredApplications.filter(a => ['soumis', 'preselectionne', 'admis_oral', 'liste_attente'].includes(a.status)).length,
+        rejected: filteredApplications.filter(a => ['non_eligible', 'non_preselectionne', 'refuse_ecrit', 'refuse_final'].includes(a.status)).length,
     };
 
     const upcomingDeadlines = filteredApplications
