@@ -379,20 +379,20 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-screen items-center justify-center px-4 py-8 text-center">
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75" onClick={onClose}></div>
+                <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm" onClick={onClose}></div>
 
-                <div className="relative w-full max-w-2xl rounded-2xl bg-white p-6 text-left shadow-xl">
+                <div className="relative w-full max-w-2xl rounded-2xl bg-white dark:bg-gray-800 p-6 text-left shadow-xl border border-gray-100 dark:border-gray-700">
                     <div className="flex items-start justify-between gap-4">
                         <div>
-                            <h3 className="text-xl font-bold text-gray-900">Importer une candidature JSON</h3>
-                            <p className="mt-1 text-sm text-gray-500">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Importer une candidature JSON</h3>
+                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                 La candidature sera creee automatiquement avec le statut brouillon.
                             </p>
                         </div>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="rounded-md bg-white text-gray-400 hover:text-gray-600"
+                            className="rounded-md bg-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                         >
                             <span className="sr-only">Fermer</span>
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -403,7 +403,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
 
                     <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                         {error && (
-                            <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+                            <div className="rounded-lg bg-red-50 dark:bg-red-900/30 p-3 text-sm text-red-600 dark:text-red-400">{error}</div>
                         )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -413,36 +413,36 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                                     onChange={(event) => setJsonText(event.target.value)}
                                     rows={15}
                                     spellCheck={false}
-                                    className="w-full rounded-lg border border-gray-300 bg-gray-950 p-4 font-mono text-sm text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-950 dark:bg-gray-900 p-4 font-mono text-sm text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 custom-scrollbar"
                                 />
-                                <div className="mt-2 rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
+                                <div className="mt-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 p-3 text-xs text-gray-600 dark:text-gray-400">
                                     L'import accepte un JSON simple ou détaillé. Les événements et documents sont extraits.
                                 </div>
                             </div>
                             
-                            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 max-h-[22rem] overflow-y-auto">
-                                <h4 className="font-semibold text-gray-700 mb-2">Aperçu ({previews.length} candidature{previews.length > 1 ? 's' : ''})</h4>
+                            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-4 max-h-[22rem] overflow-y-auto custom-scrollbar">
+                                <h4 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Aperçu ({previews.length} candidature{previews.length > 1 ? 's' : ''})</h4>
                                 {previews.length > 0 ? (
                                     <div className="space-y-6">
                                         {previews.map((preview, index) => (
-                                            <div key={index} className="space-y-3 text-sm pb-4 border-b border-gray-200 last:border-0 last:pb-0">
+                                            <div key={index} className="space-y-3 text-sm pb-4 border-b border-gray-200 dark:border-gray-600 last:border-0 last:pb-0 text-gray-700 dark:text-gray-300">
                                                 <div>
-                                                    <span className="font-medium">Institution : </span>
+                                                    <span className="font-medium text-gray-900 dark:text-white">Institution : </span>
                                                     {preview.institution_id ? (
-                                                        <span className="text-green-600">Existante (ID: {preview.institution_id})</span>
+                                                        <span className="text-green-600 dark:text-green-400">Existante (ID: {preview.institution_id})</span>
                                                     ) : (
-                                                        <span className="text-orange-600">Nouvelle : {preview.new_institution_name}</span>
+                                                        <span className="text-orange-600 dark:text-orange-400">Nouvelle : {preview.new_institution_name}</span>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">Programme : </span>
+                                                    <span className="font-medium text-gray-900 dark:text-white">Programme : </span>
                                                     <span>{preview.program_name} ({preview.program_type})</span>
                                                 </div>
-                                                <div className="text-xs text-gray-500 mt-1">
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                     {preview.events.length} événement(s), {preview.checklist_items.length} document(s) à préparer.
                                                 </div>
                                                 {preview.isDuplicate && (
-                                                    <div className="mt-2 text-xs font-bold text-red-600 bg-red-50 p-2 rounded border border-red-100">
+                                                    <div className="mt-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-2 rounded border border-red-100 dark:border-red-800/50">
                                                         ⚠️ Cette candidature existe déjà (elle sera ignorée lors de l'import).
                                                     </div>
                                                 )}
@@ -450,23 +450,23 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="text-gray-400 italic">JSON invalide ou incomplet pour l'aperçu. Assurez-vous d'avoir au moins un program_name.</div>
+                                    <div className="text-gray-400 dark:text-gray-500 italic">JSON invalide ou incomplet pour l'aperçu. Assurez-vous d'avoir au moins un program_name.</div>
                                 )}
                             </div>
                         </div>
 
-                        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end mt-6">
                             <button
                                 type="button"
                                 onClick={onClose}
-                                className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                                className="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
                             >
                                 Annuler
                             </button>
                             <button
                                 type="submit"
                                 disabled={loading || previews.filter(p => !p.isDuplicate).length === 0}
-                                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
+                                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 {loading ? 'Création...' : (() => {
                                     const validCount = previews.filter(p => !p.isDuplicate).length;
