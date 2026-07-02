@@ -15,6 +15,7 @@ import {
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, XMarkIcon, FunnelIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import ApplicationDetails from '../components/ApplicationDetails';
 
 const getAcronym = (name) => {
     if (!name) return '';
@@ -133,6 +134,7 @@ const Calendar = () => {
     const [schoolSearchQuery, setSchoolSearchQuery] = useState('');
     const [hideRejected, setHideRejected] = useState(false);
     const [selectedDayEvents, setSelectedDayEvents] = useState(null);
+    const [selectedApplicationId, setSelectedApplicationId] = useState(null);
 
     useEffect(() => {
         const fetchApplications = async () => {
@@ -512,7 +514,11 @@ const Calendar = () => {
                         </div>
                         <div className="space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
                             {selectedDayEvents.events.map(event => (
-                                <div key={event.id} className="rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-3">
+                                <div 
+                                    key={event.id} 
+                                    onClick={() => setSelectedApplicationId(event.appId)}
+                                    className="cursor-pointer rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-3 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                                >
                                     <div className="flex items-center justify-between gap-3">
                                         <span className={`rounded-full px-2 py-1 text-xs font-medium ${EVENT_TYPES[event.type]?.color || EVENT_TYPES.other.color}`}>
                                             {EVENT_TYPES[event.type]?.label || 'Autre'}
@@ -678,6 +684,19 @@ const Calendar = () => {
                         </div>
                     </div>
                 </div>
+            )}
+            
+            {selectedApplicationId && (
+                <ApplicationDetails 
+                    applicationId={selectedApplicationId} 
+                    onClose={() => setSelectedApplicationId(null)}
+                    onDeleteSuccess={(deletedId) => {
+                        setApplications(prev => prev.filter(app => app.id !== deletedId));
+                        setSelectedApplicationId(null);
+                        setSelectedDayEvents(null); // Close the day modal as well since its data might be stale
+                    }}
+                    onEdit={() => {}} // Calendar does not currently handle edit form
+                />
             )}
         </div>
     );
