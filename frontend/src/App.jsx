@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ApplicationsProvider } from './contexts/ApplicationsContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -27,7 +28,9 @@ function App() {
                     
                     <Route path="/" element={
                         <ProtectedRoute>
-                            <Layout />
+                            <ApplicationsProvider>
+                                <Layout />
+                            </ApplicationsProvider>
                         </ProtectedRoute>
                     }>
                         <Route index element={<Dashboard />} />

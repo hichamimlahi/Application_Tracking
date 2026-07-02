@@ -3,33 +3,17 @@ import axios from '../lib/axios';
 import { format, isAfter, isToday, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChartBarIcon, ClockIcon, CheckCircleIcon, XCircleIcon, PlusIcon, BuildingLibraryIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { useApplications } from '../contexts/ApplicationsContext';
 import ApplicationForm from '../components/ApplicationForm';
 import ApplicationDetails from '../components/ApplicationDetails';
 import JsonApplicationImport from '../components/JsonApplicationImport';
 
 const Dashboard = () => {
-    const [applications, setApplications] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { applications, loading, fetchApplications } = useApplications();
     const [showForm, setShowForm] = useState(false);
     const [showJsonImport, setShowJsonImport] = useState(false);
     const [selectedAppId, setSelectedAppId] = useState(null);
     const [filterType, setFilterType] = useState('all');
-
-    const fetchApplications = async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get('/api/applications');
-            setApplications(response.data.data);
-        } catch (error) {
-            console.error("Failed to fetch applications", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchApplications();
-    }, []);
 
     const handleFormSuccess = () => {
         setShowForm(false);

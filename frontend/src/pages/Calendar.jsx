@@ -15,6 +15,7 @@ import {
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, XMarkIcon, FunnelIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useApplications } from '../contexts/ApplicationsContext';
 import ApplicationDetails from '../components/ApplicationDetails';
 
 const getAcronym = (name) => {
@@ -120,8 +121,7 @@ const collectEvents = (applications) => {
 };
 
 const Calendar = () => {
-    const [applications, setApplications] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { applications, setApplications, loading, fetchApplications } = useApplications();
     const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
     const [filters, setFilters] = useState({
         programTypes: [],
@@ -135,21 +135,6 @@ const Calendar = () => {
     const [hideRejected, setHideRejected] = useState(false);
     const [selectedDayEvents, setSelectedDayEvents] = useState(null);
     const [selectedApplicationId, setSelectedApplicationId] = useState(null);
-
-    useEffect(() => {
-        const fetchApplications = async () => {
-            try {
-                const response = await axios.get('/api/applications');
-                setApplications(response.data.data || []);
-            } catch (error) {
-                console.error('Failed to fetch applications', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchApplications();
-    }, []);
 
     const allEvents = useMemo(() => collectEvents(applications), [applications]);
 

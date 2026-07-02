@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from '../lib/axios';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { PlusIcon, ViewColumnsIcon, DocumentArrowUpIcon, AcademicCapIcon, TrophyIcon, EyeIcon, MagnifyingGlassIcon, BuildingLibraryIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { useApplications } from '../contexts/ApplicationsContext';
 import ApplicationForm from '../components/ApplicationForm';
 import ApplicationDetails from '../components/ApplicationDetails';
 import JsonApplicationImport from '../components/JsonApplicationImport';
@@ -29,8 +30,7 @@ const getAcronym = (name) => {
 };
 
 const Kanban = () => {
-    const [applications, setApplications] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const { applications, setApplications, loading, fetchApplications } = useApplications();
     const [showForm, setShowForm] = useState(false);
     const [showJsonImport, setShowJsonImport] = useState(false);
     const [selectedAppId, setSelectedAppId] = useState(null);
@@ -47,20 +47,7 @@ const Kanban = () => {
         'resultats': { label: '3. Résultats Finaux', icon: TrophyIcon, columns: ['accepte', 'liste_attente', 'refuse_final'] }
     };
 
-    const fetchApplications = async () => {
-        try {
-            const response = await axios.get('/api/applications');
-            setApplications(response.data.data);
-        } catch (error) {
-            console.error("Failed to fetch applications", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    useEffect(() => {
-        fetchApplications();
-    }, []);
 
     const updateApplicationStatus = async (appId, newStatus) => {
         try {
