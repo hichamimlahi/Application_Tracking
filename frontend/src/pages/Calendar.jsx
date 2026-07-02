@@ -426,13 +426,13 @@ const Calendar = () => {
                                         }
                                     }}
                                     className={`min-h-[8rem] border-b border-r border-gray-100 dark:border-gray-700 p-2 transition-colors ${
-                                        dayEvents.length > 0 ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50' : ''
+                                        dayEvents.length > 0 ? 'cursor-pointer' : ''
                                     } ${
                                         isSameDay(day, new Date()) 
-                                            ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-inset ring-blue-500 dark:ring-blue-400' 
+                                            ? 'bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 ring-1 ring-inset ring-blue-500 dark:ring-blue-400' 
                                             : isSameMonth(day, currentMonth) 
-                                                ? 'bg-white dark:bg-gray-800' 
-                                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500'
+                                                ? 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700/50' 
+                                                : 'bg-gray-50 hover:bg-gray-100 dark:bg-gray-800/50 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500'
                                     }`}
                                 >
                                     <div className={`text-sm font-medium ${isSameDay(day, new Date()) ? 'text-blue-700 dark:text-blue-400' : 'dark:text-gray-300'}`}>
