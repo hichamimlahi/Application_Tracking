@@ -24,9 +24,10 @@ class UpdateApplicationRequest extends FormRequest
     {
         return [
             'institution_id' => 'sometimes|exists:institutions,id',
-            'program_name' => 'sometimes|string|max:255',
-            'program_type' => 'sometimes|in:cycle_ingenieur,master',
-            'status' => 'sometimes|in:brouillon,non_eligible,soumis,preselectionne,non_preselectionne,admis_oral,refuse_ecrit,accepte,liste_attente,refuse_final',
+            'program_name' => 'sometimes|required|string|max:255',
+            'program_type' => 'sometimes|required|in:cycle_ingenieur,master',
+            'admission_type' => 'nullable|in:sur_titre,sur_concours',
+            'status' => 'sometimes|required|in:brouillon,non_eligible,soumis,preselectionne,non_preselectionne,admis_oral,refuse_ecrit,accepte,liste_attente,refuse_final',
             'submission_method' => 'nullable|in:en_ligne,papier',
             'portal_url' => 'nullable|url|max:255',
             'deadline_date' => 'nullable|date',

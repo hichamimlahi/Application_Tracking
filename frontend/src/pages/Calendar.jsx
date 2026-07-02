@@ -90,6 +90,7 @@ const collectEvents = (applications) => {
             institution: application.institution,
             programName: application.program_name,
             programType: application.program_type,
+            admissionType: application.admission_type,
             status: application.status,
         };
 
@@ -123,6 +124,7 @@ const Calendar = () => {
     const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
     const [filters, setFilters] = useState({
         programType: 'all',
+        admissionType: 'all',
         status: 'all',
         eventType: 'all',
         institutionId: 'all',
@@ -149,6 +151,7 @@ const Calendar = () => {
     const filteredEvents = useMemo(() => {
         return allEvents.filter((event) => {
             if (filters.programType !== 'all' && event.programType !== filters.programType) return false;
+            if (filters.admissionType !== 'all' && event.admissionType !== filters.admissionType) return false;
             if (filters.status !== 'all' && event.status !== filters.status) return false;
             if (filters.eventType !== 'all' && event.type !== filters.eventType) return false;
             if (filters.institutionId !== 'all' && event.institution?.id?.toString() !== filters.institutionId) return false;
@@ -205,6 +208,22 @@ const Calendar = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    <label className="flex items-center cursor-pointer group mr-4">
+                        <div className="relative">
+                            <input 
+                                type="checkbox" 
+                                className="sr-only" 
+                                checked={hideRejected} 
+                                onChange={(e) => setHideRejected(e.target.checked)} 
+                            />
+                            <div className={`block w-10 h-6 rounded-full transition-colors ${hideRejected ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${hideRejected ? 'transform translate-x-4' : ''}`}></div>
+                        </div>
+                        <div className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors hidden sm:block">
+                            Masquer les refus
+                        </div>
+                    </label>
+
                     <button
                         type="button"
                         onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
@@ -248,8 +267,18 @@ const Calendar = () => {
                     className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
                 >
                     <option value="all">Toutes les formations</option>
-                    <option value="cycle_ingenieur">Cycles d'ingénieur</option>
-                    <option value="master">Masters</option>
+                    <option value="cycle_ingenieur">Cycle d'ingénieur</option>
+                    <option value="master">Master</option>
+                </select>
+
+                <select
+                    value={filters.admissionType}
+                    onChange={(event) => updateFilter('admissionType', event.target.value)}
+                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                >
+                    <option value="all">Toutes les admissions</option>
+                    <option value="sur_titre">Sur Titre</option>
+                    <option value="sur_concours">Sur Concours</option>
                 </select>
 
                 <select
@@ -273,24 +302,6 @@ const Calendar = () => {
                         <option key={value} value={value}>{info.label}</option>
                     ))}
                 </select>
-
-                <div className="flex items-center md:justify-end">
-                    <label className="flex items-center cursor-pointer group">
-                        <div className="relative">
-                            <input 
-                                type="checkbox" 
-                                className="sr-only" 
-                                checked={hideRejected} 
-                                onChange={(e) => setHideRejected(e.target.checked)} 
-                            />
-                            <div className={`block w-10 h-6 rounded-full transition-colors ${hideRejected ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
-                            <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${hideRejected ? 'transform translate-x-4' : ''}`}></div>
-                        </div>
-                        <div className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors">
-                            Masquer les refus
-                        </div>
-                    </label>
-                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -326,6 +337,7 @@ const Calendar = () => {
                                                 className={`truncate rounded-md border px-2 py-1 text-[11px] font-medium ${EVENT_TYPES[event.type]?.color || EVENT_TYPES.other.color}`}
                                                 title={`${event.title} - ${event.institution?.name} - ${event.programName}`}
                                             >
+                                                {event.admissionType === 'sur_titre' && '🎓 '}
                                                 {event.institution?.acronym || getAcronym(event.institution?.name)} - {event.title}
                                             </div>
                                         ))}
@@ -355,10 +367,17 @@ const Calendar = () => {
                                             {format(parseISO(event.date), 'dd MMM yyyy', { locale: fr })}
                                         </span>
                                     </div>
-                                    <p className="mt-3 text-sm font-semibold text-gray-900">
-                                        {event.institution?.acronym || event.institution?.name}
+                                    <p className="mt-3 text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                                        <span>{event.institution?.acronym || event.institution?.name}</span>
                                     </p>
-                                    <p className="mt-1 text-sm text-gray-600">{event.programName}</p>
+                                    <div className="mt-1 flex items-center justify-between text-gray-600">
+                                        <span className="text-sm">{event.programName}</span>
+                                        {event.admissionType && (
+                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${event.admissionType === 'sur_titre' ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-700'}`}>
+                                                {event.admissionType === 'sur_titre' ? '🎓 Titre' : 'Concours'}
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className="mt-2 text-xs capitalize text-gray-500">
                                         {STATUS_LABELS[event.status] || event.status}
                                     </p>

@@ -57,6 +57,7 @@ Pour importer très rapidement une annonce, copiez ce prompt dans une IA avec le
 >   },
 >   "concours": {
 >     "titre": "Titre de l'annonce",
+>     "type_admission": "sur_titre ou sur_concours",
 >     "date_limite": "2026-07-10",
 >     "date_concours": "2026-07-15",
 >     "details_concours": "Écrit pour toutes les filières",

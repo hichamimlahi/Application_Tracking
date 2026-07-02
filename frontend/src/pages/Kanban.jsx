@@ -34,7 +34,9 @@ const Kanban = () => {
     const [showForm, setShowForm] = useState(false);
     const [showJsonImport, setShowJsonImport] = useState(false);
     const [selectedAppId, setSelectedAppId] = useState(null);
+    const [editingApp, setEditingApp] = useState(null);
     const [filterType, setFilterType] = useState('all');
+    const [admissionFilter, setAdmissionFilter] = useState('all');
     const [currentPhase, setCurrentPhase] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -101,6 +103,7 @@ const Kanban = () => {
             const safeStatus = STATUSES[app.status] ? app.status : 'brouillon';
             if (safeStatus !== status) return false;
             if (filterType !== 'all' && app.program_type !== filterType) return false;
+            if (admissionFilter !== 'all' && app.admission_type !== admissionFilter) return false;
             if (searchQuery) {
                 const query = searchQuery.toLowerCase();
                 const matchName = app.institution?.name?.toLowerCase().includes(query) || false;
@@ -114,7 +117,7 @@ const Kanban = () => {
 
     const handleFormSuccess = () => {
         setShowForm(false);
-        setShowJsonImport(false);
+        setEditingApp(null);
         fetchApplications();
     };
 
@@ -152,7 +155,10 @@ const Kanban = () => {
                         Importer JSON
                     </button>
                     <button
-                        onClick={() => setShowForm(true)}
+                        onClick={() => {
+                            setEditingApp(null);
+                            setShowForm(true);
+                        }}
                         className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium text-xs"
                     >
                         <PlusIcon className="w-4 h-4 mr-1.5" />
@@ -202,21 +208,36 @@ const Kanban = () => {
                     <div className="flex items-center space-x-1.5 pl-3 sm:pl-0 sm:border-none border-l border-gray-200 hidden sm:flex">
                         <button
                             onClick={() => setFilterType('all')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filterType === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
                             Toutes
                         </button>
                         <button
                             onClick={() => setFilterType('cycle_ingenieur')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filterType === 'cycle_ingenieur' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'cycle_ingenieur' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
                             Cycles d'ingénieur
                         </button>
                         <button
                             onClick={() => setFilterType('master')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${filterType === 'master' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'master' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
                         >
                             Masters
+                        </button>
+                    </div>
+
+                    <div className="flex items-center space-x-1.5 border-l border-gray-200 pl-3 hidden lg:flex">
+                        <button
+                            onClick={() => setAdmissionFilter('all')}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${admissionFilter === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                        >
+                            Tous
+                        </button>
+                        <button
+                            onClick={() => setAdmissionFilter('sur_titre')}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${admissionFilter === 'sur_titre' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                        >
+                            🎓 Sur Titre
                         </button>
                     </div>
                 </div>
@@ -274,7 +295,14 @@ const Kanban = () => {
                                                                     {app.institution?.acronym || getAcronym(app.institution?.name)}
                                                                 </div>
                                                             </div>
-                                                            <div className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-snug">{app.program_name}</div>
+                                                            <div className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-snug">
+                                                                {app.program_name}
+                                                                {app.admission_type && (
+                                                                    <span className="ml-1 inline-flex items-center">
+                                                                        {app.admission_type === 'sur_titre' ? '🎓' : ''}
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                             <div className="mt-3 flex items-center justify-between">
                                                                 {app.deadline_date ? (
                                                                     <div className="text-[10px] font-semibold text-red-600 bg-red-50/80 border border-red-100 px-2 py-0.5 rounded-md flex items-center">
@@ -314,7 +342,11 @@ const Kanban = () => {
 
             {showForm && (
                 <ApplicationForm 
-                    onClose={() => setShowForm(false)} 
+                    application={editingApp}
+                    onClose={() => {
+                        setShowForm(false);
+                        setEditingApp(null);
+                    }} 
                     onSuccess={handleFormSuccess} 
                 />
             )}
@@ -332,9 +364,9 @@ const Kanban = () => {
                     onClose={() => setSelectedAppId(null)}
                     onDeleteSuccess={handleDeleteSuccess}
                     onEdit={(app) => {
-                        // Open the edit form and pass the app. For now we just close details.
                         setSelectedAppId(null);
-                        // Optional: setShowForm(true) and pass the app object
+                        setEditingApp(app);
+                        setShowForm(true);
                     }}
                 />
             )}

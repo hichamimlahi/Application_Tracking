@@ -16,6 +16,7 @@ class Application extends Model
         'institution_id',
         'program_name',
         'program_type',
+        'admission_type',
         'status',
         'submission_method',
         'portal_url',

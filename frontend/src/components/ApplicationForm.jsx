@@ -29,6 +29,7 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
         institution_id: application?.institution_id || '',
         program_name: application?.program_name || '',
         program_type: application?.program_type || 'cycle_ingenieur',
+        admission_type: application?.admission_type || '',
         status: application?.status || 'brouillon',
         submission_method: application?.submission_method || 'en_ligne',
         portal_url: application?.portal_url || '',
@@ -204,6 +205,21 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                             {STATUSES.map(s => (
                                                 <option key={s.id} value={s.id}>{s.name}</option>
                                             ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor="admission_type" className="block text-sm font-medium text-gray-700">Type d'admission</label>
+                                        <select
+                                            id="admission_type"
+                                            name="admission_type"
+                                            value={formData.admission_type}
+                                            onChange={handleChange}
+                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                        >
+                                            <option value="">Non précisé</option>
+                                            <option value="sur_titre">Sur Titre (Dossier)</option>
+                                            <option value="sur_concours">Sur Concours (Écrit)</option>
                                         </select>
                                     </div>
 

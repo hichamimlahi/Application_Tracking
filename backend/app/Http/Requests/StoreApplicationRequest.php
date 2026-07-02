@@ -28,6 +28,7 @@ class StoreApplicationRequest extends FormRequest
             'new_institution_website' => 'nullable|url|max:255',
             'program_name' => 'required|string|max:255',
             'program_type' => 'required|in:cycle_ingenieur,master',
+            'admission_type' => 'nullable|in:sur_titre,sur_concours',
             'status' => 'nullable|in:brouillon,non_eligible,soumis,preselectionne,non_preselectionne,admis_oral,refuse_ecrit,accepte,liste_attente,refuse_final',
             'submission_method' => 'nullable|in:en_ligne,papier',
             'portal_url' => 'nullable|url|max:255',

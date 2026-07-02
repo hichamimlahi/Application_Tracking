@@ -40,6 +40,7 @@ class ApplicationController extends Controller
             'institution_id' => $validated['institution_id'],
             'program_name' => $validated['program_name'],
             'program_type' => $validated['program_type'],
+            'admission_type' => $validated['admission_type'] ?? null,
             'status' => $validated['status'] ?? 'brouillon',
             'submission_method' => $validated['submission_method'] ?? null,
             'portal_url' => $validated['portal_url'] ?? null,

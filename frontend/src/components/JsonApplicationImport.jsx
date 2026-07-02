@@ -45,20 +45,26 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [previews, setPreviews] = useState([]);
 
+    const [applications, setApplications] = useState([]);
+
     useEffect(() => {
-        const fetchInstitutions = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get('/api/institutions');
-                setInstitutions(response.data.data || []);
+                const [instRes, appRes] = await Promise.all([
+                    axios.get('/api/institutions'),
+                    axios.get('/api/applications')
+                ]);
+                setInstitutions(instRes.data.data || []);
+                setApplications(appRes.data.data || []);
             } catch (err) {
-                setError("Impossible de charger la liste des institutions.");
+                setError("Impossible de charger les données requises.");
             }
         };
 
-        fetchInstitutions();
+        fetchData();
     }, []);
 
-    const normalize = (value) => String(value || '').trim().toLowerCase();
+    const normalize = (value) => String(value || '').trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     const valueFrom = (...values) => {
         return values.find((value) => value !== undefined && value !== null && value !== '') || '';
@@ -286,13 +292,25 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
             ? documents.map((doc, index) => ({ title: doc, status: 'todo', position: index }))
             : [];
 
+        const instNameToMatch = institutionPayload.nom || institutionPayload.name || institutionPayload.sigle;
+        const isDuplicate = applications.some(app => {
+            const sameInst = institutionId 
+                ? app.institution_id === institutionId 
+                : (normalize(app.institution?.name) === normalize(instNameToMatch) || 
+                   normalize(app.institution?.acronym) === normalize(institutionPayload.sigle || institutionPayload.acronym));
+            
+            return sameInst && normalize(app.program_name) === normalize(programName);
+        });
+
         return {
+            isDuplicate,
             institution_id: institutionId,
             new_institution_name: !institutionId ? (institutionPayload.nom || institutionPayload.name || institutionPayload.sigle || 'Nouvelle Institution') : null,
             new_institution_acronym: !institutionId ? (institutionPayload.sigle?.trim() || institutionPayload.acronym?.trim() || null) : null,
             new_institution_website: !institutionId ? cleanUrl(institutionPayload.site_web || institutionPayload.website) : null,
             program_name: programName,
             program_type: valueFrom(payload.program_type, payload.type, formationPayload.type) || 'cycle_ingenieur',
+            admission_type: valueFrom(payload.admission_type, payload.type_admission, payload.concours?.type_admission, payload.concours?.admission_type) || '',
             status: 'brouillon',
             submission_method: mapSubmissionMethod(valueFrom(payload.submission_method, payload.mode_candidature, payload.concours?.mode_candidature)) || 'en_ligne',
             portal_url: cleanUrl(valueFrom(payload.portal_url, payload.lien_candidature, payload.concours?.lien_candidature)),
@@ -309,26 +327,45 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
             if (!Array.isArray(parsed)) {
                 parsed = [parsed];
             }
-            const payloads = parsed.map(p => buildApplicationPayload(p));
+            const payloads = [];
+            for (const p of parsed) {
+                const payload = buildApplicationPayload(p);
+                if (!payload.isDuplicate) {
+                    const selfDuplicate = payloads.some(existing => 
+                        (existing.institution_id === payload.institution_id || normalize(existing.new_institution_name) === normalize(payload.new_institution_name)) && 
+                        normalize(existing.program_name) === normalize(payload.program_name)
+                    );
+                    if (selfDuplicate) payload.isDuplicate = true;
+                }
+                payloads.push(payload);
+            }
             setPreviews(payloads);
             setError('');
-        } catch (err) {
+        } catch (e) {
             setPreviews([]);
+            // don't set error on parse fail to allow typing
         }
-    }, [jsonText, institutions]);
+    }, [jsonText, institutions, applications]);
 
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!previews || previews.length === 0) {
-            setError("JSON invalide ou données manquantes.");
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        
+        const validPreviews = previews.filter(p => !p.isDuplicate);
+        
+        if (validPreviews.length === 0) {
+            if (previews.length > 0) {
+                setError("Toutes les candidatures du JSON existent déjà. Aucune action n'a été effectuée.");
+            } else {
+                setError("Aucune candidature valide à importer.");
+            }
             return;
         }
 
-        setError('');
         setLoading(true);
 
         try {
-            for (const payload of previews) {
+            for (const payload of validPreviews) {
                 await axios.post('/api/applications', payload);
             }
             onSuccess();
@@ -404,6 +441,11 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                                                 <div className="text-xs text-gray-500 mt-1">
                                                     {preview.events.length} événement(s), {preview.checklist_items.length} document(s) à préparer.
                                                 </div>
+                                                {preview.isDuplicate && (
+                                                    <div className="mt-2 text-xs font-bold text-red-600 bg-red-50 p-2 rounded border border-red-100">
+                                                        ⚠️ Cette candidature existe déjà (elle sera ignorée lors de l'import).
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -423,10 +465,13 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                             </button>
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || previews.filter(p => !p.isDuplicate).length === 0}
                                 className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60"
                             >
-                                {loading ? 'Création...' : (previews.length > 1 ? `Créer ${previews.length} candidatures` : 'Créer la candidature')}
+                                {loading ? 'Création...' : (() => {
+                                    const validCount = previews.filter(p => !p.isDuplicate).length;
+                                    return validCount > 1 ? `Créer ${validCount} candidatures` : (validCount === 1 ? 'Créer la candidature' : 'Aucune à créer');
+                                })()}
                             </button>
                         </div>
                     </form>

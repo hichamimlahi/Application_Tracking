@@ -230,8 +230,18 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
                         <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight leading-tight">
                             {application.institution?.name}
                         </h2>
-                        <p className="text-sm sm:text-base text-gray-500 mt-2 font-medium">
+                        <p className="text-sm sm:text-base text-gray-500 mt-2 font-medium flex items-center gap-2">
                             {application.program_name}
+                            {application.admission_type === 'sur_titre' && (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200">
+                                    🎓 Sur Titre
+                                </span>
+                            )}
+                            {application.admission_type === 'sur_concours' && (
+                                <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-orange-100 text-orange-800 border border-orange-200">
+                                    Sur Concours
+                                </span>
+                            )}
                         </p>
                     </div>
                     
