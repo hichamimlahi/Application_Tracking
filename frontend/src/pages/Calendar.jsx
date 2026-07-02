@@ -14,7 +14,7 @@ import {
     subMonths,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, XMarkIcon, FunnelIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 const getAcronym = (name) => {
     if (!name) return '';
@@ -123,12 +123,14 @@ const Calendar = () => {
     const [loading, setLoading] = useState(true);
     const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
     const [filters, setFilters] = useState({
-        programType: 'all',
-        admissionType: 'all',
-        status: 'all',
-        eventType: 'all',
-        institutionId: 'all',
+        programTypes: [],
+        admissionTypes: [],
+        statuses: [],
+        eventTypes: [],
+        institutionIds: [],
     });
+    const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+    const [schoolSearchQuery, setSchoolSearchQuery] = useState('');
     const [hideRejected, setHideRejected] = useState(false);
     const [selectedDayEvents, setSelectedDayEvents] = useState(null);
 
@@ -151,13 +153,18 @@ const Calendar = () => {
 
     const filteredEvents = useMemo(() => {
         return allEvents.filter((event) => {
-            if (filters.programType !== 'all' && event.programType !== filters.programType) return false;
-            if (filters.admissionType !== 'all' && event.admissionType !== filters.admissionType) return false;
-            if (filters.status !== 'all' && event.status !== filters.status) return false;
-            if (filters.eventType !== 'all' && event.type !== filters.eventType) return false;
-            if (filters.institutionId !== 'all') {
-                const selectedIds = filters.institutionId.split(',');
-                if (!selectedIds.includes(event.institution?.id?.toString())) return false;
+            if (filters.programTypes.length > 0 && !filters.programTypes.includes(event.programType)) return false;
+            if (filters.admissionTypes.length > 0 && !filters.admissionTypes.includes(event.admissionType)) return false;
+            if (filters.statuses.length > 0 && !filters.statuses.includes(event.status)) return false;
+            if (filters.eventTypes.length > 0 && !filters.eventTypes.includes(event.type)) return false;
+            
+            if (filters.institutionIds.length > 0) {
+                const eventInstId = event.institution?.id?.toString();
+                const isIncluded = filters.institutionIds.some(groupIds => {
+                    const idsArray = groupIds.split(',');
+                    return idsArray.includes(eventInstId);
+                });
+                if (!isIncluded) return false;
             }
             
             if (hideRejected) {
@@ -206,9 +213,41 @@ const Calendar = () => {
         return parseISO(event.date) >= today;
     }).slice(0, 8);
 
-    const updateFilter = (name, value) => {
-        setFilters((current) => ({ ...current, [name]: value }));
+    const toggleFilter = (category, value) => {
+        setFilters(prev => {
+            const current = prev[category];
+            if (current.includes(value)) {
+                return { ...prev, [category]: current.filter(v => v !== value) };
+            } else {
+                return { ...prev, [category]: [...current, value] };
+            }
+        });
     };
+
+    const removeFilter = (category, value) => {
+        setFilters(prev => ({ ...prev, [category]: prev[category].filter(v => v !== value) }));
+    };
+
+    const clearFilters = () => {
+        setFilters({
+            programTypes: [],
+            admissionTypes: [],
+            statuses: [],
+            eventTypes: [],
+            institutionIds: [],
+        });
+    };
+
+    const getFilterLabel = (category, value) => {
+        if (category === 'programTypes') return value === 'cycle_ingenieur' ? "Cycle d'ingénieur" : 'Master';
+        if (category === 'admissionTypes') return value === 'sur_titre' ? 'Sur Titre' : 'Sur Concours';
+        if (category === 'statuses') return STATUS_LABELS[value] || value;
+        if (category === 'eventTypes') return EVENT_TYPES[value]?.label || value;
+        if (category === 'institutionIds') return uniqueInstitutions.find(i => i.id === value)?.name || value;
+        return value;
+    };
+    
+    const activeFiltersCount = Object.values(filters).reduce((acc, curr) => acc + curr.length, 0);
 
     if (loading) {
         return <div className="animate-pulse">Chargement du calendrier...</div>;
@@ -264,59 +303,36 @@ const Calendar = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-5 items-center mb-6">
-                <select
-                    value={filters.institutionId}
-                    onChange={(event) => updateFilter('institutionId', event.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
+            <div className="mb-6 flex flex-wrap items-center gap-2">
+                <button
+                    onClick={() => setIsFilterPanelOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                    <option value="all">Toutes les écoles</option>
-                    {uniqueInstitutions.map((inst) => (
-                        <option key={inst.id} value={inst.id}>{inst.name}</option>
-                    ))}
-                </select>
-
-                <select
-                    value={filters.programType}
-                    onChange={(event) => updateFilter('programType', event.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
-                >
-                    <option value="all">Toutes les formations</option>
-                    <option value="cycle_ingenieur">Cycle d'ingénieur</option>
-                    <option value="master">Master</option>
-                </select>
-
-                <select
-                    value={filters.admissionType}
-                    onChange={(event) => updateFilter('admissionType', event.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
-                >
-                    <option value="all">Toutes les admissions</option>
-                    <option value="sur_titre">Sur Titre</option>
-                    <option value="sur_concours">Sur Concours</option>
-                </select>
-
-                <select
-                    value={filters.status}
-                    onChange={(event) => updateFilter('status', event.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
-                >
-                    <option value="all">Tous les statuts</option>
-                    {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                        <option key={value} value={value}>{label}</option>
-                    ))}
-                </select>
-
-                <select
-                    value={filters.eventType}
-                    onChange={(event) => updateFilter('eventType', event.target.value)}
-                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
-                >
-                    <option value="all">Toutes les dates</option>
-                    {Object.entries(EVENT_TYPES).map(([value, info]) => (
-                        <option key={value} value={value}>{info.label}</option>
-                    ))}
-                </select>
+                    <FunnelIcon className="h-5 w-5" />
+                    Filtres
+                    {activeFiltersCount > 0 && (
+                        <span className="ml-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 text-xs font-bold text-blue-700 dark:text-blue-400">
+                            {activeFiltersCount}
+                        </span>
+                    )}
+                </button>
+                
+                {Object.entries(filters).map(([category, values]) => (
+                    values.map(value => (
+                        <span key={`${category}-${value}`} className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
+                            {getFilterLabel(category, value)}
+                            <button onClick={() => removeFilter(category, value)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                                <XMarkIcon className="h-4 w-4" />
+                            </button>
+                        </span>
+                    ))
+                ))}
+                
+                {activeFiltersCount > 0 && (
+                    <button onClick={clearFilters} className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline ml-2">
+                        Tout effacer
+                    </button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -452,6 +468,147 @@ const Calendar = () => {
                                     </p>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {isFilterPanelOpen && (
+                <div className="fixed inset-0 z-50 overflow-hidden">
+                    <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity" onClick={() => setIsFilterPanelOpen(false)} />
+                    <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+                        <div className="w-screen max-w-md transform transition-transform">
+                            <div className="flex h-full flex-col bg-white dark:bg-gray-800 shadow-xl">
+                                <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-700 px-6 py-4">
+                                    <h2 className="text-lg font-bold text-gray-900 dark:text-white">Filtres</h2>
+                                    <button
+                                        onClick={() => setIsFilterPanelOpen(false)}
+                                        className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 transition-colors"
+                                    >
+                                        <XMarkIcon className="h-6 w-6" />
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                                    <div className="space-y-8">
+                                        
+                                        {/* Écoles */}
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Écoles</h3>
+                                            <div className="relative mb-3">
+                                                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                    <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Rechercher une école..."
+                                                    className="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 py-2 pl-9 pr-3 text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                    value={schoolSearchQuery}
+                                                    onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="max-h-48 overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                                                {uniqueInstitutions
+                                                    .filter(inst => inst.name.toLowerCase().includes(schoolSearchQuery.toLowerCase()))
+                                                    .map(inst => (
+                                                        <label key={inst.id} className="flex items-center">
+                                                            <input
+                                                                type="checkbox"
+                                                                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-500"
+                                                                checked={filters.institutionIds.includes(inst.id)}
+                                                                onChange={() => toggleFilter('institutionIds', inst.id)}
+                                                            />
+                                                            <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">{inst.name}</span>
+                                                        </label>
+                                                    ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Formations */}
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Formations</h3>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center">
+                                                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                        checked={filters.programTypes.includes('cycle_ingenieur')}
+                                                        onChange={() => toggleFilter('programTypes', 'cycle_ingenieur')} />
+                                                    <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">Cycle d'ingénieur</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                        checked={filters.programTypes.includes('master')}
+                                                        onChange={() => toggleFilter('programTypes', 'master')} />
+                                                    <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">Master</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        {/* Admissions */}
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Admissions</h3>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center">
+                                                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                        checked={filters.admissionTypes.includes('sur_titre')}
+                                                        onChange={() => toggleFilter('admissionTypes', 'sur_titre')} />
+                                                    <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">Sur Titre</span>
+                                                </label>
+                                                <label className="flex items-center">
+                                                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                        checked={filters.admissionTypes.includes('sur_concours')}
+                                                        onChange={() => toggleFilter('admissionTypes', 'sur_concours')} />
+                                                    <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">Sur Concours</span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        {/* Types d'événements */}
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Types d'événements</h3>
+                                            <div className="space-y-2">
+                                                {Object.entries(EVENT_TYPES).map(([value, info]) => (
+                                                    <label key={value} className="flex items-center">
+                                                        <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                            checked={filters.eventTypes.includes(value)}
+                                                            onChange={() => toggleFilter('eventTypes', value)} />
+                                                        <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">{info.label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Statuts */}
+                                        <div>
+                                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Statuts</h3>
+                                            <div className="space-y-2">
+                                                {Object.entries(STATUS_LABELS).map(([value, label]) => (
+                                                    <label key={value} className="flex items-center">
+                                                        <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                            checked={filters.statuses.includes(value)}
+                                                            onChange={() => toggleFilter('statuses', value)} />
+                                                        <span className="ml-3 text-sm text-gray-700 dark:text-gray-300">{label}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div className="border-t border-gray-100 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-900">
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={clearFilters}
+                                            className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                        >
+                                            Tout effacer
+                                        </button>
+                                        <button
+                                            onClick={() => setIsFilterPanelOpen(false)}
+                                            className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
+                                        >
+                                            Afficher les résultats
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
