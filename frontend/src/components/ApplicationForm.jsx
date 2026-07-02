@@ -75,13 +75,13 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" onClick={onClose}></div>
+                <div className="fixed inset-0 transition-opacity bg-gray-500 dark:bg-gray-900 bg-opacity-75 dark:bg-opacity-80" onClick={onClose}></div>
 
-                <div className="relative inline-block w-full max-w-2xl px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-2xl shadow-xl sm:my-8 sm:p-6 sm:align-middle">
+                <div className="relative inline-block w-full max-w-2xl px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-gray-800 rounded-2xl shadow-xl sm:my-8 sm:p-6 sm:align-middle border border-gray-200 dark:border-gray-700">
                     <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
                         <button
                             type="button"
-                            className="text-gray-400 bg-white rounded-md hover:text-gray-500 focus:outline-none"
+                            className="text-gray-400 dark:text-gray-500 bg-white dark:bg-gray-800 rounded-md hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none"
                             onClick={onClose}
                         >
                             <span className="sr-only">Fermer</span>
@@ -93,25 +93,25 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                     
                     <div className="sm:flex sm:items-start">
                         <div className="w-full mt-3 text-center sm:mt-0 sm:text-left">
-                            <h3 className="text-xl font-bold leading-6 text-gray-900">
+                            <h3 className="text-xl font-bold leading-6 text-gray-900 dark:text-white">
                                 {application ? 'Modifier la candidature' : 'Nouvelle candidature'}
                             </h3>
                             
                             <form onSubmit={handleSubmit} className="mt-6 space-y-6">
                                 {error && (
-                                    <div className="p-3 text-sm text-red-500 bg-red-50 rounded-lg">{error}</div>
+                                    <div className="p-3 text-sm text-red-500 dark:text-red-400 bg-red-50 dark:bg-red-900/30 rounded-lg">{error}</div>
                                 )}
 
                                 <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                                     <div className="sm:col-span-1">
-                                        <label htmlFor="program_type" className="block text-sm font-medium text-gray-700">Type de formation</label>
+                                        <label htmlFor="program_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type de formation</label>
                                         <select
                                             id="program_type"
                                             name="program_type"
                                             required
                                             value={formData.program_type}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
                                         >
                                             <option value="cycle_ingenieur">Cycle d'Ingénieur</option>
                                             <option value="master">Master</option>
@@ -119,27 +119,27 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                     </div>
 
                                     <div className="sm:col-span-1 relative">
-                                        <label htmlFor="institution_id" className="block text-sm font-medium text-gray-700">Institution</label>
+                                        <label htmlFor="institution_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Institution</label>
                                         <div className="mt-1 relative">
                                             <button
                                                 type="button"
                                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                                className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                                                className="relative w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                                             >
                                                 <span className="flex items-center">
                                                     {formData.institution_id ? (
                                                         <>
                                                             {institutions.find(i => i.id == formData.institution_id)?.logo ? (
-                                                                <img src={institutions.find(i => i.id == formData.institution_id).logo} alt="" className="flex-shrink-0 h-6 w-6 rounded-md mr-3 object-contain" />
+                                                                <img src={institutions.find(i => i.id == formData.institution_id).logo} alt="" className="flex-shrink-0 h-6 w-6 rounded-md mr-3 object-contain bg-white dark:bg-gray-800" />
                                                             ) : (
-                                                                <span className="flex-shrink-0 h-6 w-6 rounded-md bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 mr-3">
+                                                                <span className="flex-shrink-0 h-6 w-6 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400 mr-3">
                                                                     {institutions.find(i => i.id == formData.institution_id)?.acronym?.substring(0,2) || '??'}
                                                                 </span>
                                                             )}
                                                             <span className="block truncate">{institutions.find(i => i.id == formData.institution_id)?.name}</span>
                                                         </>
                                                     ) : (
-                                                        <span className="block truncate text-gray-500">Sélectionnez une institution</span>
+                                                        <span className="block truncate text-gray-500 dark:text-gray-400">Sélectionnez une institution</span>
                                                     )}
                                                 </span>
                                                 <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -150,11 +150,11 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                             </button>
 
                                             {isDropdownOpen && (
-                                                <ul className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-56 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                <ul className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-56 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 overflow-auto focus:outline-none sm:text-sm">
                                                     {institutions.map((inst) => (
                                                         <li
                                                             key={inst.id}
-                                                            className="text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50"
+                                                            className="text-gray-900 dark:text-gray-100 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-blue-50 dark:hover:bg-blue-900/30"
                                                             onClick={() => {
                                                                 setFormData({ ...formData, institution_id: inst.id });
                                                                 setIsDropdownOpen(false);
@@ -162,9 +162,9 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                                         >
                                                             <div className="flex items-center">
                                                                 {inst.logo ? (
-                                                                    <img src={inst.logo} alt="" className="flex-shrink-0 h-6 w-6 rounded-md object-contain bg-white" />
+                                                                    <img src={inst.logo} alt="" className="flex-shrink-0 h-6 w-6 rounded-md object-contain bg-white dark:bg-gray-800" />
                                                                 ) : (
-                                                                    <span className="flex-shrink-0 h-6 w-6 rounded-md bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">
+                                                                    <span className="flex-shrink-0 h-6 w-6 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-gray-400">
                                                                         {inst.acronym?.substring(0,2) || inst.name.substring(0,2)}
                                                                     </span>
                                                                 )}
@@ -180,7 +180,7 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <label htmlFor="program_name" className="block text-sm font-medium text-gray-700">Nom du Programme / Filière</label>
+                                        <label htmlFor="program_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nom du Programme / Filière</label>
                                         <input
                                             type="text"
                                             name="program_name"
@@ -188,19 +188,19 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                             required
                                             value={formData.program_name}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border placeholder-gray-400 dark:placeholder-gray-500"
                                             placeholder="Ex: Génie Logiciel"
                                         />
                                     </div>
 
                                     <div>
-                                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Statut</label>
+                                        <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Statut</label>
                                         <select
                                             id="status"
                                             name="status"
                                             value={formData.status}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
                                         >
                                             {STATUSES.map(s => (
                                                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -209,13 +209,13 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="admission_type" className="block text-sm font-medium text-gray-700">Type d'admission</label>
+                                        <label htmlFor="admission_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Type d'admission</label>
                                         <select
                                             id="admission_type"
                                             name="admission_type"
                                             value={formData.admission_type}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
                                         >
                                             <option value="">Non précisé</option>
                                             <option value="sur_titre">Sur Titre (Dossier)</option>
@@ -224,13 +224,13 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="submission_method" className="block text-sm font-medium text-gray-700">Méthode de soumission</label>
+                                        <label htmlFor="submission_method" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Méthode de soumission</label>
                                         <select
                                             id="submission_method"
                                             name="submission_method"
                                             value={formData.submission_method}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
                                         >
                                             {SUBMISSION_METHODS.map(s => (
                                                 <option key={s.id} value={s.id}>{s.name}</option>
@@ -239,39 +239,39 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <label htmlFor="portal_url" className="block text-sm font-medium text-gray-700">Lien du portail de candidature (Optionnel)</label>
+                                        <label htmlFor="portal_url" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Lien du portail de candidature (Optionnel)</label>
                                         <input
                                             type="url"
                                             name="portal_url"
                                             id="portal_url"
                                             value={formData.portal_url}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border placeholder-gray-400 dark:placeholder-gray-500"
                                             placeholder="https://..."
                                         />
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <label htmlFor="deadline_date" className="block text-sm font-medium text-gray-700">Date limite</label>
+                                        <label htmlFor="deadline_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date limite</label>
                                         <input
                                             type="date"
                                             name="deadline_date"
                                             id="deadline_date"
                                             value={formData.deadline_date}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border w-fit pr-8"
                                         />
                                     </div>
 
                                     <div className="sm:col-span-2">
-                                        <label htmlFor="notes" className="block text-sm font-medium text-gray-700">Notes / Remarques</label>
+                                        <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Notes / Remarques</label>
                                         <textarea
                                             id="notes"
                                             name="notes"
                                             rows={3}
                                             value={formData.notes}
                                             onChange={handleChange}
-                                            className="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border"
+                                            className="block w-full mt-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm py-2 px-3 border placeholder-gray-400 dark:placeholder-gray-500"
                                             placeholder="Identifiants de connexion, documents manquants..."
                                         />
                                     </div>
@@ -288,7 +288,7 @@ const ApplicationForm = ({ application = null, onClose, onSuccess }) => {
                                     <button
                                         type="button"
                                         onClick={onClose}
-                                        className="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
+                                        className="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto sm:text-sm"
                                     >
                                         Annuler
                                     </button>

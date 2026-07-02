@@ -14,7 +14,7 @@ import {
     subMonths,
 } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, CalendarDaysIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 const getAcronym = (name) => {
     if (!name) return '';
@@ -130,6 +130,7 @@ const Calendar = () => {
         institutionId: 'all',
     });
     const [hideRejected, setHideRejected] = useState(false);
+    const [selectedDayEvents, setSelectedDayEvents] = useState(null);
 
     useEffect(() => {
         const fetchApplications = async () => {
@@ -189,7 +190,11 @@ const Calendar = () => {
     }, [applications]);
 
     const monthEvents = filteredEvents.filter((event) => isSameMonth(parseISO(event.date), currentMonth));
-    const upcomingEvents = filteredEvents.filter((event) => parseISO(event.date) >= startOfMonth(currentMonth)).slice(0, 8);
+    const upcomingEvents = filteredEvents.filter((event) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return parseISO(event.date) >= today;
+    }).slice(0, 8);
 
     const updateFilter = (name, value) => {
         setFilters((current) => ({ ...current, [name]: value }));
@@ -203,8 +208,8 @@ const Calendar = () => {
         <div className="space-y-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Calendrier</h1>
-                    <p className="mt-1 text-sm text-gray-500">Toutes les dates importantes de vos candidatures.</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Calendrier</h1>
+                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Toutes les dates importantes de vos candidatures.</p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -216,10 +221,10 @@ const Calendar = () => {
                                 checked={hideRejected} 
                                 onChange={(e) => setHideRejected(e.target.checked)} 
                             />
-                            <div className={`block w-10 h-6 rounded-full transition-colors ${hideRejected ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
+                            <div className={`block w-10 h-6 rounded-full transition-colors ${hideRejected ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
                             <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${hideRejected ? 'transform translate-x-4' : ''}`}></div>
                         </div>
-                        <div className="ml-3 text-sm font-medium text-gray-700 group-hover:text-blue-600 transition-colors hidden sm:block">
+                        <div className="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors hidden sm:block">
                             Masquer les refus
                         </div>
                     </label>
@@ -227,14 +232,14 @@ const Calendar = () => {
                     <button
                         type="button"
                         onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-                        className="rounded-lg border border-gray-200 bg-white p-2 text-gray-600 shadow-sm hover:bg-gray-50"
+                        className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 text-gray-600 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                         <ChevronLeftIcon className="h-5 w-5" />
                     </button>
                     <button
                         type="button"
                         onClick={() => setCurrentMonth(startOfMonth(new Date()))}
-                        className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                        className="inline-flex items-center gap-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                         <CalendarDaysIcon className="h-5 w-5" />
                         Aujourd'hui
@@ -242,7 +247,7 @@ const Calendar = () => {
                     <button
                         type="button"
                         onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-                        className="rounded-lg border border-gray-200 bg-white p-2 text-gray-600 shadow-sm hover:bg-gray-50"
+                        className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 text-gray-600 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-700"
                     >
                         <ChevronRightIcon className="h-5 w-5" />
                     </button>
@@ -253,7 +258,7 @@ const Calendar = () => {
                 <select
                     value={filters.institutionId}
                     onChange={(event) => updateFilter('institutionId', event.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
                 >
                     <option value="all">Toutes les écoles</option>
                     {uniqueInstitutions.map((inst) => (
@@ -264,7 +269,7 @@ const Calendar = () => {
                 <select
                     value={filters.programType}
                     onChange={(event) => updateFilter('programType', event.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
                 >
                     <option value="all">Toutes les formations</option>
                     <option value="cycle_ingenieur">Cycle d'ingénieur</option>
@@ -274,7 +279,7 @@ const Calendar = () => {
                 <select
                     value={filters.admissionType}
                     onChange={(event) => updateFilter('admissionType', event.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
                 >
                     <option value="all">Toutes les admissions</option>
                     <option value="sur_titre">Sur Titre</option>
@@ -284,7 +289,7 @@ const Calendar = () => {
                 <select
                     value={filters.status}
                     onChange={(event) => updateFilter('status', event.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
                 >
                     <option value="all">Tous les statuts</option>
                     {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -295,7 +300,7 @@ const Calendar = () => {
                 <select
                     value={filters.eventType}
                     onChange={(event) => updateFilter('eventType', event.target.value)}
-                    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700 shadow-sm"
+                    className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 shadow-sm"
                 >
                     <option value="all">Toutes les dates</option>
                     {Object.entries(EVENT_TYPES).map(([value, info]) => (
@@ -305,14 +310,14 @@ const Calendar = () => {
             </div>
 
             <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-                <section className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-                    <div className="border-b border-gray-100 px-5 py-4">
-                        <h2 className="text-lg font-semibold capitalize text-gray-900">
+                <section className="overflow-hidden rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
+                    <div className="border-b border-gray-100 dark:border-gray-700 px-5 py-4">
+                        <h2 className="text-lg font-semibold capitalize text-gray-900 dark:text-white">
                             {format(currentMonth, 'MMMM yyyy', { locale: fr })}
                         </h2>
                     </div>
 
-                    <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50 text-center text-xs font-semibold uppercase text-gray-500">
+                    <div className="grid grid-cols-7 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 text-center text-xs font-semibold uppercase text-gray-500 dark:text-gray-400">
                         {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
                             <div key={day} className="px-2 py-3">{day}</div>
                         ))}
@@ -325,11 +330,17 @@ const Calendar = () => {
                             return (
                                 <div
                                     key={day.toISOString()}
-                                    className={`min-h-[8rem] border-b border-r border-gray-100 p-2 ${
-                                        isSameMonth(day, currentMonth) ? 'bg-white' : 'bg-gray-50 text-gray-400'
+                                    className={`min-h-[8rem] border-b border-r border-gray-100 dark:border-gray-700 p-2 ${
+                                        isSameDay(day, new Date()) 
+                                            ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-inset ring-blue-500' 
+                                            : isSameMonth(day, currentMonth) 
+                                                ? 'bg-white dark:bg-gray-800' 
+                                                : 'bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500'
                                     }`}
                                 >
-                                    <div className="text-sm font-medium">{format(day, 'd')}</div>
+                                    <div className={`text-sm font-medium ${isSameDay(day, new Date()) ? 'text-blue-700 dark:text-blue-400' : 'dark:text-gray-300'}`}>
+                                        {format(day, 'd')}
+                                    </div>
                                     <div className="mt-2 space-y-1">
                                         {dayEvents.slice(0, 3).map((event) => (
                                             <div
@@ -342,7 +353,12 @@ const Calendar = () => {
                                             </div>
                                         ))}
                                         {dayEvents.length > 3 && (
-                                            <div className="text-[11px] font-medium text-gray-500">+{dayEvents.length - 3} autres</div>
+                                            <button 
+                                                onClick={() => setSelectedDayEvents({ date: day, events: dayEvents })}
+                                                className="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline w-full text-left"
+                                            >
+                                                +{dayEvents.length - 3} autres
+                                            </button>
                                         )}
                                     </div>
                                 </div>
@@ -351,34 +367,34 @@ const Calendar = () => {
                     </div>
                 </section>
 
-                <aside className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-                    <h2 className="text-lg font-semibold text-gray-900">Prochaines dates</h2>
+                <aside className="rounded-2xl border border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 p-5 shadow-sm">
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Prochaines dates</h2>
                     <div className="mt-4 space-y-3">
                         {upcomingEvents.length === 0 ? (
-                            <p className="text-sm text-gray-500">Aucune date avec ces filtres.</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">Aucune date avec ces filtres.</p>
                         ) : (
                             upcomingEvents.map((event) => (
-                                <div key={event.id} className="rounded-xl border border-gray-100 bg-gray-50 p-3">
+                                <div key={event.id} className="rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-3">
                                     <div className="flex items-center justify-between gap-3">
                                         <span className={`rounded-full px-2 py-1 text-xs font-medium ${EVENT_TYPES[event.type].color}`}>
                                             {EVENT_TYPES[event.type].label}
                                         </span>
-                                        <span className="text-xs font-semibold text-gray-600">
+                                        <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">
                                             {format(parseISO(event.date), 'dd MMM yyyy', { locale: fr })}
                                         </span>
                                     </div>
-                                    <p className="mt-3 text-sm font-semibold text-gray-900 flex items-center gap-1.5">
+                                    <p className="mt-3 text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
                                         <span>{event.institution?.acronym || event.institution?.name}</span>
                                     </p>
-                                    <div className="mt-1 flex items-center justify-between text-gray-600">
+                                    <div className="mt-1 flex items-center justify-between text-gray-600 dark:text-gray-400">
                                         <span className="text-sm">{event.programName}</span>
                                         {event.admissionType && (
-                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${event.admissionType === 'sur_titre' ? 'bg-emerald-50 text-emerald-700' : 'bg-orange-50 text-orange-700'}`}>
+                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${event.admissionType === 'sur_titre' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'}`}>
                                                 {event.admissionType === 'sur_titre' ? '🎓 Titre' : 'Concours'}
                                             </span>
                                         )}
                                     </div>
-                                    <p className="mt-2 text-xs capitalize text-gray-500">
+                                    <p className="mt-2 text-xs capitalize text-gray-500 dark:text-gray-400">
                                         {STATUS_LABELS[event.status] || event.status}
                                     </p>
                                 </div>
@@ -387,6 +403,49 @@ const Calendar = () => {
                     </div>
                 </aside>
             </div>
+
+            {selectedDayEvents && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-xl">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                Événements du {format(selectedDayEvents.date, 'dd MMMM yyyy', { locale: fr })}
+                            </h3>
+                            <button
+                                onClick={() => setSelectedDayEvents(null)}
+                                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+                            >
+                                <XMarkIcon className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto custom-scrollbar pr-2">
+                            {selectedDayEvents.events.map(event => (
+                                <div key={event.id} className="rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 p-3">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <span className={`rounded-full px-2 py-1 text-xs font-medium ${EVENT_TYPES[event.type]?.color || EVENT_TYPES.other.color}`}>
+                                            {EVENT_TYPES[event.type]?.label || 'Autre'}
+                                        </span>
+                                    </div>
+                                    <p className="mt-3 text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
+                                        <span>{event.institution?.name || event.institution?.acronym}</span>
+                                    </p>
+                                    <div className="mt-1 flex items-center justify-between text-gray-600 dark:text-gray-400">
+                                        <span className="text-sm">{event.programName}</span>
+                                        {event.admissionType && (
+                                            <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold ${event.admissionType === 'sur_titre' ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'}`}>
+                                                {event.admissionType === 'sur_titre' ? '🎓 Titre' : 'Concours'}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <p className="mt-2 text-xs capitalize text-gray-500 dark:text-gray-400">
+                                        {STATUS_LABELS[event.status] || event.status}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

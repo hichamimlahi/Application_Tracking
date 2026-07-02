@@ -132,8 +132,8 @@ const Kanban = () => {
         <div className="h-full flex flex-col">
             <div className="mb-3 flex justify-between items-end">
                 <div>
-                    <h1 className="text-xl font-bold text-gray-900 tracking-tight">Suivi Kanban</h1>
-                    <p className="text-xs text-gray-500 mt-0.5">Glissez-déposez vos candidatures pour mettre à jour leur statut.</p>
+                    <h1 className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Suivi Kanban</h1>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Glissez-déposez vos candidatures pour mettre à jour leur statut.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     {/* Search Bar moved to top */}
@@ -144,13 +144,13 @@ const Kanban = () => {
                             placeholder="Rechercher une école..." 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-48 transition-all shadow-sm"
+                            className="pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-500 w-48 transition-all shadow-sm"
                         />
                     </div>
                     
                     <button
                         onClick={() => setShowJsonImport(true)}
-                        className="inline-flex items-center px-3 py-1.5 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors shadow-sm font-medium text-xs"
+                        className="inline-flex items-center px-3 py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm font-medium text-xs"
                     >
                         Importer JSON
                     </button>
@@ -159,7 +159,7 @@ const Kanban = () => {
                             setEditingApp(null);
                             setShowForm(true);
                         }}
-                        className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm font-medium text-xs"
+                        className="inline-flex items-center px-3 py-1.5 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors shadow-sm font-medium text-xs"
                     >
                         <PlusIcon className="w-4 h-4 mr-1.5" />
                         Nouvelle Candidature
@@ -169,7 +169,7 @@ const Kanban = () => {
 
             <div className="flex justify-between items-center mb-4">
                 {/* Premium Phases Navigation */}
-                <div className="flex bg-white/60 backdrop-blur-xl p-1 rounded-xl shadow-sm border border-gray-200/60 w-fit">
+                <div className="flex bg-white/60 dark:bg-gray-800/60 backdrop-blur-xl p-1 rounded-xl shadow-sm border border-gray-200/60 dark:border-gray-700/60 w-fit">
                     {Object.entries(PHASES).map(([phaseKey, phase]) => {
                         const Icon = phase.icon;
                         const isActive = currentPhase === phaseKey;
@@ -179,14 +179,14 @@ const Kanban = () => {
                                 onClick={() => setCurrentPhase(phaseKey)}
                                 className={`relative flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[13px] font-semibold transition-all duration-300 overflow-hidden ${
                                     isActive
-                                        ? 'text-blue-700 shadow-sm'
-                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50/80'
+                                        ? 'text-blue-700 dark:text-blue-300 shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50/80 dark:hover:bg-gray-700/50'
                                 }`}
                             >
                                 {isActive && (
-                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-50/90 to-indigo-50/90 rounded-lg" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-50/90 to-indigo-50/90 dark:from-blue-900/40 dark:to-indigo-900/40 rounded-lg" />
                                 )}
-                                <Icon className={`relative z-10 w-4 h-4 transition-colors ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                                <Icon className={`relative z-10 w-4 h-4 transition-colors ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400'}`} />
                                 <span className="relative z-10 tracking-tight">{phase.label}</span>
                             </button>
                         );
@@ -202,40 +202,40 @@ const Kanban = () => {
                             placeholder="Rechercher..." 
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-32 transition-all shadow-sm"
+                            className="pl-8 pr-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-[12px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-32 transition-all shadow-sm"
                         />
                     </div>
-                    <div className="flex items-center space-x-1.5 pl-3 sm:pl-0 sm:border-none border-l border-gray-200 hidden sm:flex">
+                    <div className="flex items-center space-x-1.5 pl-3 sm:pl-0 sm:border-none border-l border-gray-200 dark:border-gray-700 hidden sm:flex">
                         <button
                             onClick={() => setFilterType('all')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'all' ? 'bg-gray-800 dark:bg-gray-700 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm'}`}
                         >
                             Toutes
                         </button>
                         <button
                             onClick={() => setFilterType('cycle_ingenieur')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'cycle_ingenieur' ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'cycle_ingenieur' ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm'}`}
                         >
                             Cycles d'ingénieur
                         </button>
                         <button
                             onClick={() => setFilterType('master')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'master' ? 'bg-purple-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${filterType === 'master' ? 'bg-purple-600 dark:bg-purple-500 text-white shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm'}`}
                         >
                             Masters
                         </button>
                     </div>
 
-                    <div className="flex items-center space-x-1.5 border-l border-gray-200 pl-3 hidden lg:flex">
+                    <div className="flex items-center space-x-1.5 border-l border-gray-200 dark:border-gray-700 pl-3 hidden lg:flex">
                         <button
                             onClick={() => setAdmissionFilter('all')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${admissionFilter === 'all' ? 'bg-gray-800 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${admissionFilter === 'all' ? 'bg-gray-800 dark:bg-gray-700 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm'}`}
                         >
                             Tous
                         </button>
                         <button
                             onClick={() => setAdmissionFilter('sur_titre')}
-                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${admissionFilter === 'sur_titre' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200 shadow-sm'}`}
+                            className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap transition-colors ${admissionFilter === 'sur_titre' ? 'bg-emerald-600 dark:bg-emerald-500 text-white shadow-sm' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm'}`}
                         >
                             🎓 Sur Titre
                         </button>
@@ -254,19 +254,19 @@ const Kanban = () => {
                                     <div
                                         ref={provided.innerRef}
                                         {...provided.droppableProps}
-                                        className={`w-64 flex-shrink-0 rounded-[20px] flex flex-col shadow-sm border border-gray-200/80 bg-gray-50/40 transition-all duration-300 ${snapshot.isDraggingOver ? 'ring-2 ring-blue-400/60 bg-blue-50/40' : 'hover:shadow-md hover:border-gray-300/80'}`}
+                                        className={`w-64 flex-shrink-0 rounded-[20px] flex flex-col shadow-sm border border-gray-200/80 dark:border-gray-700 bg-gray-50/40 dark:bg-gray-800/40 transition-all duration-300 ${snapshot.isDraggingOver ? 'ring-2 ring-blue-400/60 dark:ring-blue-500/50 bg-blue-50/40 dark:bg-blue-900/20' : 'hover:shadow-md hover:border-gray-300/80 dark:hover:border-gray-600'}`}
                                     >
                                         {/* Sticky Header */}
                                         <div className="sticky top-0 z-10 rounded-t-[20px] overflow-hidden">
                                             {/* Colored top bar */}
                                             <div className={`h-1.5 w-full ${column.border.replace('border-t-', 'bg-')}`}></div>
                                             
-                                            <div className="px-3 py-2.5 border-b border-gray-200/50 flex justify-between items-center bg-white/80 backdrop-blur-md shadow-sm">
+                                            <div className="px-3 py-2.5 border-b border-gray-200/50 dark:border-gray-700/50 flex justify-between items-center bg-white/80 dark:bg-gray-800/90 backdrop-blur-md shadow-sm">
                                                 <div className="flex items-center space-x-2">
-                                                    <span className={`w-2 h-2 rounded-full shadow-sm ring-1 ring-white ${column.dot}`}></span>
-                                                    <h3 className="font-bold text-gray-800 tracking-wider text-[11px] uppercase">{column.title}</h3>
+                                                    <span className={`w-2 h-2 rounded-full shadow-sm ring-1 ring-white dark:ring-gray-800 ${column.dot}`}></span>
+                                                    <h3 className="font-bold text-gray-800 dark:text-gray-100 tracking-wider text-[11px] uppercase">{column.title}</h3>
                                                 </div>
-                                                <span className="text-[10px] font-bold bg-white px-2 py-0.5 rounded-full text-gray-600 shadow-sm border border-gray-100">{getAppsByStatus(column.id).length}</span>
+                                                <span className="text-[10px] font-bold bg-white dark:bg-gray-700 px-2 py-0.5 rounded-full text-gray-600 dark:text-gray-300 shadow-sm border border-gray-100 dark:border-gray-600">{getAppsByStatus(column.id).length}</span>
                                             </div>
                                         </div>
                                         
@@ -279,23 +279,23 @@ const Kanban = () => {
                                                             {...provided.draggableProps}
                                                             {...provided.dragHandleProps}
                                                             onClick={() => setSelectedAppId(app.id)}
-                                                            className={`bg-white p-3 rounded-xl border border-gray-200 cursor-pointer hover:border-blue-300 transition-all duration-200 ${
+                                                            className={`bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-blue-300 dark:hover:border-blue-500 transition-all duration-200 ${
                                                                 snapshot.isDragging ? 'shadow-xl ring-2 ring-blue-500 rotate-2' : 'shadow-sm hover:shadow-md'
                                                             }`}
                                                         >
                                                             <div className="flex items-center space-x-2">
                                                                 {app.institution?.logo ? (
-                                                                    <img src={app.institution.logo} alt="" className="w-6 h-6 rounded-md object-contain bg-white flex-shrink-0 shadow-sm border border-gray-100" />
+                                                                    <img src={app.institution.logo} alt="" className="w-6 h-6 rounded-md object-contain bg-white dark:bg-gray-800 flex-shrink-0 shadow-sm border border-gray-100 dark:border-gray-700" />
                                                                 ) : (
-                                                                    <span className="w-6 h-6 rounded-md bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-[9px] flex-shrink-0">
+                                                                    <span className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold text-[9px] flex-shrink-0">
                                                                         {app.institution?.acronym?.substring(0,3) || getAcronym(app.institution?.name).substring(0, 3)}
                                                                     </span>
                                                                 )}
-                                                                <div className="font-bold text-gray-800 leading-tight text-[13px] line-clamp-1">
+                                                                <div className="font-bold text-gray-800 dark:text-gray-100 leading-tight text-[13px] line-clamp-1">
                                                                     {app.institution?.acronym || getAcronym(app.institution?.name)}
                                                                 </div>
                                                             </div>
-                                                            <div className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-snug">
+                                                            <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 leading-snug">
                                                                 {app.program_name}
                                                                 {app.admission_type && (
                                                                     <span className="ml-1 inline-flex items-center">
@@ -305,7 +305,7 @@ const Kanban = () => {
                                                             </div>
                                                             <div className="mt-3 flex items-center justify-between">
                                                                 {app.deadline_date ? (
-                                                                    <div className="text-[10px] font-semibold text-red-600 bg-red-50/80 border border-red-100 px-2 py-0.5 rounded-md flex items-center">
+                                                                    <div className="text-[10px] font-semibold text-red-600 dark:text-red-400 bg-red-50/80 dark:bg-red-900/30 border border-red-100 dark:border-red-800/50 px-2 py-0.5 rounded-md flex items-center">
                                                                         <svg className="w-2.5 h-2.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                         </svg>
@@ -319,7 +319,7 @@ const Kanban = () => {
                                                                         target="_blank" 
                                                                         rel="noreferrer" 
                                                                         onClick={(e) => e.stopPropagation()}
-                                                                        className="text-indigo-600 bg-indigo-50 hover:bg-indigo-100 p-1 rounded-md transition-colors border border-indigo-100 shadow-sm"
+                                                                        className="text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 p-1 rounded-md transition-colors border border-indigo-100 dark:border-indigo-800/50 shadow-sm"
                                                                         title="Voir le reçu"
                                                                     >
                                                                         <EyeIcon className="w-4 h-4" />
