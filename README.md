@@ -6,8 +6,9 @@ L'application propose un suivi visuel (Kanban), un calendrier dynamique et une g
 
 ## ✨ Fonctionnalités Principales
 - **Tableau Kanban Interactif** : Suivez vos candidatures par étapes (Brouillon, Dépôt, Concours, Résultats) avec un simple glisser-déposer (Drag & Drop).
+- **Calendrier Dynamique & Filtres Avancés** : Visualisez toutes les dates importantes avec un panneau latéral de filtres multi-critères (par école avec barre de recherche interne, type de formation, admissions, etc.).
 - **Import Intelligent par JSON** : Copiez-collez un texte d'annonce généré par IA, l'application extrait automatiquement les écoles, dates, épreuves et documents requis.
-- **Calendrier Dynamique** : Visualisez toutes les dates importantes (limites, écrits, oraux, inscriptions) avec des filtres par école et par type de formation.
+- **Mode Sombre (Dark Mode) Intégral** : Interface moderne, premium et confortable adaptée au mode sombre sur l'ensemble de l'application (tableaux, formulaires, modales, etc.).
 - **Gestion des Pièces Jointes** : Espace dédié au Drag & Drop pour ajouter vos reçus de préinscription et documents PDF/Images directement sur chaque candidature.
 
 ## ⚙️ Installation Docker
