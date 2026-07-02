@@ -27,13 +27,13 @@ const getAcronym = (name) => {
 };
 
 const EVENT_TYPES = {
-    deadline: { label: 'Date limite', color: 'bg-red-100 text-red-700 border-red-200', dot: 'bg-red-500' },
-    exam: { label: 'Concours / Écrit', color: 'bg-purple-100 text-purple-700 border-purple-200', dot: 'bg-purple-500' },
-    preselection: { label: 'Présélection', color: 'bg-orange-100 text-orange-700 border-orange-200', dot: 'bg-orange-500' },
-    oral: { label: 'Entretien / Oral', color: 'bg-teal-100 text-teal-700 border-teal-200', dot: 'bg-teal-500' },
-    result: { label: 'Résultats / Admis', color: 'bg-green-100 text-green-700 border-green-200', dot: 'bg-green-500' },
-    registration: { label: 'Inscription', color: 'bg-indigo-100 text-indigo-700 border-indigo-200', dot: 'bg-indigo-500' },
-    other: { label: 'Autre date', color: 'bg-blue-100 text-blue-700 border-blue-200', dot: 'bg-blue-500' },
+    deadline: { label: 'Date limite', color: 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800/50', dot: 'bg-red-500' },
+    exam: { label: 'Concours / Écrit', color: 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/50', dot: 'bg-purple-500' },
+    preselection: { label: 'Présélection', color: 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800/50', dot: 'bg-orange-500' },
+    oral: { label: 'Entretien / Oral', color: 'bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800/50', dot: 'bg-teal-500' },
+    result: { label: 'Résultats / Admis', color: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800/50', dot: 'bg-green-500' },
+    registration: { label: 'Inscription', color: 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800/50', dot: 'bg-indigo-500' },
+    other: { label: 'Autre date', color: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800/50', dot: 'bg-blue-500' },
 };
 
 const STATUS_LABELS = {
@@ -332,7 +332,7 @@ const Calendar = () => {
                                     key={day.toISOString()}
                                     className={`min-h-[8rem] border-b border-r border-gray-100 dark:border-gray-700 p-2 ${
                                         isSameDay(day, new Date()) 
-                                            ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-inset ring-blue-500' 
+                                            ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-inset ring-blue-500 dark:ring-blue-400' 
                                             : isSameMonth(day, currentMonth) 
                                                 ? 'bg-white dark:bg-gray-800' 
                                                 : 'bg-gray-50 dark:bg-gray-800/50 text-gray-400 dark:text-gray-500'
