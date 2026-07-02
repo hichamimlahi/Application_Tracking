@@ -155,7 +155,10 @@ const Calendar = () => {
             if (filters.admissionType !== 'all' && event.admissionType !== filters.admissionType) return false;
             if (filters.status !== 'all' && event.status !== filters.status) return false;
             if (filters.eventType !== 'all' && event.type !== filters.eventType) return false;
-            if (filters.institutionId !== 'all' && event.institution?.id?.toString() !== filters.institutionId) return false;
+            if (filters.institutionId !== 'all') {
+                const selectedIds = filters.institutionId.split(',');
+                if (!selectedIds.includes(event.institution?.id?.toString())) return false;
+            }
             
             if (hideRejected) {
                 const rejectedStatuses = ['non_eligible', 'non_preselectionne', 'refuse_ecrit', 'refuse_final'];
@@ -181,11 +184,18 @@ const Calendar = () => {
         const map = new Map();
         applications.forEach(app => {
             if (app.institution) {
-                map.set(app.institution.id.toString(), app.institution.acronym || app.institution.name);
+                const name = app.institution.acronym || app.institution.name;
+                if (!map.has(name)) {
+                    map.set(name, []);
+                }
+                const ids = map.get(name);
+                if (!ids.includes(app.institution.id.toString())) {
+                    ids.push(app.institution.id.toString());
+                }
             }
         });
         return Array.from(map.entries())
-            .map(([id, name]) => ({ id, name }))
+            .map(([name, ids]) => ({ id: ids.join(','), name }))
             .sort((a, b) => a.name.localeCompare(b.name));
     }, [applications]);
 
