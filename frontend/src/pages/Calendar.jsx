@@ -417,7 +417,15 @@ const Calendar = () => {
                             return (
                                 <div
                                     key={day.toISOString()}
-                                    className={`min-h-[8rem] border-b border-r border-gray-100 dark:border-gray-700 p-2 ${
+                                    onClick={(e) => {
+                                        if (dayEvents.length > 0) {
+                                            // Prevent triggering if clicking exactly on a button inside the cell that might have its own logic, though currently we only have the "+X autres" which does the same thing.
+                                            setSelectedDayEvents({ date: day, events: dayEvents });
+                                        }
+                                    }}
+                                    className={`min-h-[8rem] border-b border-r border-gray-100 dark:border-gray-700 p-2 transition-colors ${
+                                        dayEvents.length > 0 ? 'cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50' : ''
+                                    } ${
                                         isSameDay(day, new Date()) 
                                             ? 'bg-blue-50 dark:bg-blue-900/20 ring-1 ring-inset ring-blue-500 dark:ring-blue-400' 
                                             : isSameMonth(day, currentMonth) 
@@ -440,12 +448,9 @@ const Calendar = () => {
                                             </div>
                                         ))}
                                         {dayEvents.length > 3 && (
-                                            <button 
-                                                onClick={() => setSelectedDayEvents({ date: day, events: dayEvents })}
-                                                className="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:underline w-full text-left"
-                                            >
+                                            <div className="text-[11px] font-medium text-blue-600 dark:text-blue-400 mt-1">
                                                 +{dayEvents.length - 3} autres
-                                            </button>
+                                            </div>
                                         )}
                                     </div>
                                 </div>
