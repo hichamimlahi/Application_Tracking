@@ -1,5 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../lib/axios';
+import { DocumentDuplicateIcon, CheckIcon } from '@heroicons/react/24/outline';
+
+const CHATGPT_PROMPT = `Agis en tant qu'assistant d'extraction de données. Je vais te donner une annonce de master ou cycle d'ingénieur. Extrais les informations au format JSON strict.
+
+IMPORTANT : Pour le nom de l'établissement (institution.nom et institution.sigle), précise TOUJOURS la ville (ex: FST Mohammedia, FST Marrakech, ENSA Agadir). Ne donne jamais juste 'FSTM', 'FSTG' ou 'ENSA' car c'est ambigu.
+
+Structure attendue :
+{
+  "institution": {
+    "sigle": "Ex: FST Mohammedia",
+    "nom": "Faculté des Sciences et Techniques Mohammedia",
+    "ville": "Mohammedia",
+    "site_web": "url"
+  },
+  "formation": { "nom": "...", "type": "cycle_ingenieur ou master", "niveau": "..." },
+  "concours": { "titre": "...", "annee": "...", "date_limite": "YYYY-MM-DD", "date_concours": "YYYY-MM-DD", "mode_candidature": "en_ligne ou papier", "lien_candidature": "..." },
+  "conditions": ["..."],
+  "documents": ["..."],
+  "frais": "...",
+  "contact": { "email": "...", "telephone": "..." },
+  "notes": "..."
+}`;
 
 const SAMPLE_JSON = `{
   "institution": {
@@ -44,6 +66,7 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [previews, setPreviews] = useState([]);
+    const [copiedPrompt, setCopiedPrompt] = useState(false);
 
     const [applications, setApplications] = useState([]);
 
@@ -415,8 +438,31 @@ const JsonApplicationImport = ({ onClose, onSuccess }) => {
                                     spellCheck={false}
                                     className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-950 dark:bg-gray-900 p-4 font-mono text-sm text-gray-100 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 custom-scrollbar"
                                 />
-                                <div className="mt-2 rounded-lg bg-gray-50 dark:bg-gray-700/50 p-3 text-xs text-gray-600 dark:text-gray-400">
-                                    L'import accepte un JSON simple ou détaillé. Les événements et documents sont extraits.
+                                <div className="mt-3 flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                        L'import accepte un JSON simple ou détaillé.
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            navigator.clipboard.writeText(CHATGPT_PROMPT);
+                                            setCopiedPrompt(true);
+                                            setTimeout(() => setCopiedPrompt(false), 2000);
+                                        }}
+                                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 transition-colors border border-blue-200 dark:border-blue-800"
+                                    >
+                                        {copiedPrompt ? (
+                                            <>
+                                                <CheckIcon className="w-3.5 h-3.5 mr-1.5" />
+                                                Prompt Copié !
+                                            </>
+                                        ) : (
+                                            <>
+                                                <DocumentDuplicateIcon className="w-3.5 h-3.5 mr-1.5" />
+                                                Copier le Prompt ChatGPT
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
                             
