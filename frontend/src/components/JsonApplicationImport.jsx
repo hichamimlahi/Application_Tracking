@@ -2,26 +2,75 @@ import React, { useEffect, useState } from 'react';
 import axios from '../lib/axios';
 import { DocumentDuplicateIcon, CheckIcon } from '@heroicons/react/24/outline';
 
-const CHATGPT_PROMPT = `Agis en tant qu'assistant d'extraction de données. Je vais te donner une annonce de master ou cycle d'ingénieur. Extrais les informations au format JSON strict.
+const CHATGPT_PROMPT = `Tu es un assistant expert en extraction de données structurées. Ton objectif est de lire des documents ou des textes d'avis de concours (universités, écoles d'ingénieurs, masters, etc.) et d'en extraire les informations clés pour générer un objet JSON strict et bien formaté.
 
-IMPORTANT : Pour le nom de l'établissement (institution.nom et institution.sigle), précise TOUJOURS la ville (ex: FST Mohammedia, FST Marrakech, ENSA Agadir). Ne donne jamais juste 'FSTM', 'FSTG' ou 'ENSA' car c'est ambigu.
+Règles d'extraction et de formatage obligatoires :
 
-Structure attendue :
+1. Type d'admission (type_admission) : Dans l'objet concours, tu dois ajouter un champ "type_admission". Sa valeur par défaut est "sur_concours". Toutefois, si le texte analysé mentionne explicitement "sur titre" ou "au titre", la valeur de ce champ doit obligatoirement être "sur_titre".
+
+2. Nom de la formation (formation.nom) : Si la candidature est qualifiée de "sur titre", tu dois impérativement ajouter la mention "(Accès sur titre)" à la fin de la valeur du champ formation.nom.
+
+3. Acronymes et Villes (IMPORTANT) : Pour les établissements de type FST, ENSA, ENSAM et FS (Facultés des Sciences), tu dois TOUJOURS inclure la ville dans le sigle et le nom pour éviter les confusions (Exemples : sigle: "FST Mohammedia", nom: "Faculté des Sciences et Techniques Mohammedia"). Pour les autres établissements uniques (ex: EMI, INPT), utilise le sigle normal.
+
+4. Valeurs manquantes : Si une information n'est pas mentionnée, utilise null pour les strings ou [] pour les listes. Ne jamais inventer d'informations.
+
+5. Format des dates : Extrais les dates au format standard "YYYY-MM-DD" dans les champs date_*. Les précisions supplémentaires vont dans details_*.
+
+Structure JSON attendue (renvoie UNIQUEMENT le JSON) :
 {
   "institution": {
-    "sigle": "Ex: FST Mohammedia",
-    "nom": "Faculté des Sciences et Techniques Mohammedia",
-    "ville": "Mohammedia",
-    "site_web": "url"
+    "sigle": "Acronyme (avec la ville pour FST/ENSA/ENSAM/FS)",
+    "nom": "Nom complet",
+    "ville": "Ville",
+    "site_web": "URL"
   },
-  "formation": { "nom": "...", "type": "cycle_ingenieur ou master", "niveau": "..." },
-  "concours": { "titre": "...", "annee": "...", "date_limite": "YYYY-MM-DD", "date_concours": "YYYY-MM-DD", "mode_candidature": "en_ligne ou papier", "lien_candidature": "..." },
-  "conditions": ["..."],
-  "documents": ["..."],
-  "frais": "...",
-  "contact": { "email": "...", "telephone": "..." },
-  "notes": "..."
-}`;
+  "formation": {
+    "nom": "Nom de la formation (avec ' (Accès sur titre)' si applicable)",
+    "type": "cycle_ingenieur, master, licence",
+    "niveau": "Niveau d'accès",
+    "specialite": "Filières proposées",
+    "places": "Nombre de places"
+  },
+  "concours": {
+    "titre": "Titre exact de l'avis",
+    "annee": "Année (ex: 2026-2027)",
+    "type_admission": "sur_titre ou sur_concours",
+    "date_ouverture": "YYYY-MM-DD",
+    "details_ouverture": "Précisions",
+    "date_limite": "YYYY-MM-DD",
+    "details_limite": "Précisions",
+    "date_preselection": "YYYY-MM-DD",
+    "details_preselection": "Détails",
+    "date_concours": "YYYY-MM-DD",
+    "details_concours": "Détails",
+    "date_resultats_ecrit": "YYYY-MM-DD",
+    "details_resultats_ecrit": "Détails",
+    "date_oral": "YYYY-MM-DD",
+    "details_oral": "Détails",
+    "date_entretien": "YYYY-MM-DD",
+    "details_entretien": "Détails",
+    "date_resultats": "YYYY-MM-DD",
+    "details_resultats": "Détails",
+    "date_inscription_principale": "YYYY-MM-DD",
+    "details_inscription_principale": "Détails",
+    "date_inscription_attente": "YYYY-MM-DD",
+    "details_inscription_attente": "Détails",
+    "mode_candidature": "Mode de candidature",
+    "lien_candidature": "URL de préinscription",
+    "procedure": "Résumé court des étapes"
+  },
+  "conditions": ["Condition 1", "Condition 2"],
+  "documents": ["Document 1", "Document 2"],
+  "epreuves": ["Epreuve 1", "Epreuve 2"],
+  "frais": "Frais si mentionnés, sinon null",
+  "contact": {
+    "email": "Email",
+    "telephone": "Téléphone",
+    "adresse": "Adresse"
+  },
+  "notes": "Toute autre information importante"
+}
+`;
 
 const SAMPLE_JSON = `{
   "institution": {
