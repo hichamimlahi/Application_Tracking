@@ -47,10 +47,14 @@ const formatDate = (dateString) => {
         return dateString;
     }
 };
+import { useApplications } from '../contexts/ApplicationsContext';
 
 const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess }) => {
-    const [application, setApplication] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { applications, setApplications } = useApplications();
+    const globalApp = applications.find(a => a.id === applicationId);
+    
+    const [application, setApplication] = useState(globalApp || null);
+    const [loading, setLoading] = useState(!globalApp);
     const [uploading, setUploading] = useState(false);
     
     const [uploadData, setUploadData] = useState({ file: null, type: 'cv' });
@@ -60,13 +64,18 @@ const ApplicationDetails = ({ applicationId, onClose, onEdit, onDeleteSuccess })
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
-        if (applicationId) fetchApplication();
+        if (applicationId) {
+            fetchApplication();
+        }
     }, [applicationId]);
 
     const fetchApplication = async () => {
         try {
             const response = await axios.get(`/api/applications/${applicationId}`);
-            setApplication(response.data.data);
+            const updatedApp = response.data.data;
+            setApplication(updatedApp);
+            // Sync with global context so Kanban/Calendar stay updated
+            setApplications(prev => prev.map(a => a.id === applicationId ? updatedApp : a));
         } catch (err) {
             console.error(err);
         } finally {
